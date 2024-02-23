@@ -20,8 +20,7 @@ func main() {
 		}
 
 		input = strings.TrimSpace(input)     //quitamos el salto de linea
-		lowerInput := strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 		//Para llamar una funcion desde otro archivo este debe ir en mayuscula al inicio
-		analyzer.Command(lowerInput)
+		analyzer_test.Command(input)
 	}
 }
