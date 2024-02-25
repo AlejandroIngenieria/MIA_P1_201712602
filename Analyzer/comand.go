@@ -2,20 +2,31 @@ package analyzer_test
 
 import (
 	"P1/Functions"
+	"P1/Utilities"
+	"bufio"
 	"flag"
 	"fmt"
 	"strings"
 )
 
 func Command(input string) {
+
+	// Verificar si el input está vacío
+	if input == "" {
+		return // No hacer nada si el input está vacío
+	}
+
 	comando := input
 	input = strings.ToLower(input)
 	switch {
 	case strings.HasPrefix(input, "mkdisk"):
+		fmt.Println(input)
 		handleMKDISKCommand(comando)
 	case strings.HasPrefix(input, "rmdisk"):
+		fmt.Println(input)
 		handleRMDISKCommand(comando)
 	case strings.HasPrefix(input, "fdisk"):
+		fmt.Println(input)
 		handleFDISKCommand(comando)
 	case strings.HasPrefix(input, "mount"):
 		handleMOUNTCommand(comando)
@@ -63,6 +74,8 @@ func Command(input string) {
 		handlePAUSECommand(comando)
 	case strings.HasPrefix(input, "execute"):
 		handleEXECUTECommand(comando)
+	case strings.HasPrefix(input, "rep"):
+		handleREPCommand(comando)
 	case strings.HasPrefix(input, "#"):
 	default:
 		fmt.Println("Comando no reconocido:", input)
@@ -71,13 +84,13 @@ func Command(input string) {
 
 var (
 	size        = flag.Int("size", 0, "Tamaño")
-	fit         = flag.String("fit", "ff", "Ajuste")
-	unit        = flag.String("unit", "m", "Unidad")
-	type_       = flag.String("type", "p", "Tipo")
+	fit         = flag.String("fit", "", "Ajuste")
+	unit        = flag.String("unit", "", "Unidad")
+	type_       = flag.String("type", "", "Tipo")
 	driveletter = flag.String("driveletter", "", "Busqueda")
 	name        = flag.String("name", "", "Nombre")
 	delete      = flag.String("delete", "", "Eliminar")
-	add         = flag.String("add", "", "Añadir/Quitar")
+	add         = flag.Int("add", 0, "Añadir/Quitar")
 	path        = flag.String("path", "", "Directorio")
 )
 
@@ -93,7 +106,7 @@ func handleMKDISKCommand(input string) {
 	}
 
 	// validate fit equals to b/w/f
-	if *fit != "bf" && *fit != "ff" && *fit != "wf" {
+	if *fit != "b" && *fit != "f" && *fit != "w" {
 		fmt.Println("Error: Fit must be (bf/ff/wf)")
 		return
 	}
@@ -107,8 +120,8 @@ func handleMKDISKCommand(input string) {
 	// Create the file
 	functions_test.CreateBinFile(size, fit, unit)
 	*size = 0
-	*fit = "f"
-	*unit = "m"
+	*fit = ""
+	*unit = ""
 }
 
 func handleRMDISKCommand(input string) {
@@ -131,8 +144,9 @@ func handleFDISKCommand(input string) {
 	flag.Parse()
 	functions_test.ProcessFDISK(input, size, driveletter, name, unit, type_, fit, delete, add, path)
 
+	//Obligatorio cuando no existe la particion
 	// validate size > 0
-	if *size <= 0 {
+	if *size <= 0 && *delete != "full" && *add == 0{
 		fmt.Println("Error: Size must be greater than 0")
 		return
 	}
@@ -147,7 +161,7 @@ func handleFDISKCommand(input string) {
 	}
 
 	// validate fit equals to b/w/f
-	if *fit != "bf" && *fit != "ff" && *fit != "wf" {
+	if *fit != "b" && *fit != "f" && *fit != "w" {
 		fmt.Println("Error: Fit must be (BF/FF/WF)")
 		return
 	}
@@ -158,15 +172,34 @@ func handleFDISKCommand(input string) {
 		return
 	}
 
-	if *type_ != "p" && *type_ != "e" && *type_ != "l" {
+	println("ADD", *add)
+	// validate type equals to P/E/L
+	if *type_ != "p" && *type_ != "e" && *type_ != "l" && *delete != "full" && *add == 0{
 		fmt.Println("Error: Type must be (P/E/L)")
 		return
 	}
 
-	if *delete == "" || *name == "" || *path == "" {
-		fmt.Println("Error: Delete -> remember that needs name and path")
-		return
+	if *delete != "" {
+		if *delete != "full" {
+			fmt.Println("Error: Delete must be full")
+			return
+		}
+		if *name == "" && *path == "" {
+			println("Error: you need path and name to delete")
+			return
+		}
 	}
+
+	functions_test.CRUD_Partitions(size, driveletter, name, unit, type_, fit, delete, add, path)
+	*size = 0
+	*driveletter = ""
+	*name = ""
+	*unit = ""
+	*type_ = ""
+	*fit = ""
+	*delete = ""
+	*add = 0
+	*path = ""
 }
 
 func handleMOUNTCommand(input string) {
@@ -253,10 +286,43 @@ func handleCHMODCommand(input string) {
 	panic("unimplemented")
 }
 
-func handlePAUSECommand(comando string) {
+func handlePAUSECommand(input string) {
 	panic("unimplemented")
 }
 
 func handleEXECUTECommand(input string) {
+	flag.Parse()
+	functions_test.ProcessExecute(input, path)
+	if *path == "" {
+		fmt.Println("Error: Path cannot be empty")
+		return
+	}
+	// Open bin file
+	file, err := utilities_test.OpenFile(*path)
+	if err != nil {
+		return
+	}
+
+	// Close bin file
+	defer file.Close()
+
+	// Crea un nuevo scanner para leer el archivo
+	scanner := bufio.NewScanner(file)
+
+	// Itera sobre cada línea del archivo
+	for scanner.Scan() {
+		linea := scanner.Text() // Lee la línea actual
+		//fmt.Println(linea)
+		Command(linea)
+	}
+
+	// Verifica si hubo algún error durante la lectura
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error al leer el archivo:", err)
+	}
+	*path = ""
+}
+
+func handleREPCommand(comando string) {
 	panic("unimplemented")
 }
