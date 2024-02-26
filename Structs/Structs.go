@@ -1,4 +1,5 @@
 package structs_test
+
 import "fmt"
 
 // ? DISCOS extension .dsk
@@ -12,15 +13,19 @@ type MBR struct {
 	Mbr_particion      [4]Partition
 }
 
-func PrintMBR(data MBR){
+func PrintMBR(data MBR) {
 	fmt.Printf("CreationDate: %s, fit: %s, size: %d \n", string(data.Mbr_fecha_creacion[:]), string(data.Dsk_fit[:]), data.Mbr_tamano)
 	for i := 0; i < 4; i++ {
-		fmt.Printf("Partition %d, Name: %s, Tipo: %s, Start: %d, Size: %d \n",
-		 i, 
-		string(data.Mbr_particion[i].Part_name[:]), 
-		string(data.Mbr_particion[i].Part_type[:]), 
-		data.Mbr_particion[i].Part_start, 
-		data.Mbr_particion[i].Part_size,
+		fmt.Printf("Partition %d, Name: %s, Tipo: %s, Start: %d, Size: %d Status %s Correlativo %d ID %s CORRELATIVE: %d \n",
+			i,
+			string(data.Mbr_particion[i].Part_name[:]),
+			string(data.Mbr_particion[i].Part_type[:]),
+			data.Mbr_particion[i].Part_start,
+			data.Mbr_particion[i].Part_size,
+			string(data.Mbr_particion[i].Part_status[:]),
+			data.Mbr_particion[i].Part_correlative,
+			string(data.Mbr_particion[i].Part_id[:]),
+			data.Mbr_particion[i].Part_correlative,
 		)
 	}
 }
@@ -45,6 +50,17 @@ type EBR struct {
 	Part_s     int32
 	Part_next  int32
 	Part_name  [16]byte
+}
+
+func PrintEBR(data EBR) {
+	fmt.Printf("MOUNT: %s FIT: %s START: %d SIZE: %d NEXT: %d NAME: %s \n",
+		string(data.Part_mount[:]),
+		string(data.Part_fit[:]),
+		data.Part_start,
+		data.Part_s,
+		data.Part_next,
+		string(data.Part_name[:]),
+	)
 }
 
 // ? CARPETAS Y ARCHIVOS (EXT3|EXT2)

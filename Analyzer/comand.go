@@ -29,10 +29,13 @@ func Command(input string) {
 		fmt.Println(input)
 		handleFDISKCommand(comando)
 	case strings.HasPrefix(input, "mount"):
+		fmt.Println(input)
 		handleMOUNTCommand(comando)
 	case strings.HasPrefix(input, "unmount"):
+		fmt.Println(input)
 		handleUNMOUNTCommand(comando)
 	case strings.HasPrefix(input, "mkfs"):
+		fmt.Println(input)
 		handleMKFSCommand(comando)
 	case strings.HasPrefix(input, "login"):
 		handleLOGINCommand(comando)
@@ -92,6 +95,7 @@ var (
 	delete      = flag.String("delete", "", "Eliminar")
 	add         = flag.Int("add", 0, "Añadir/Quitar")
 	path        = flag.String("path", "", "Directorio")
+	id        = flag.String("id", "", "ID")
 )
 
 func handleMKDISKCommand(input string) {
@@ -146,7 +150,7 @@ func handleFDISKCommand(input string) {
 
 	//Obligatorio cuando no existe la particion
 	// validate size > 0
-	if *size <= 0 && *delete != "full" && *add == 0{
+	if *size <= 0 && *delete != "full" && *add == 0 {
 		fmt.Println("Error: Size must be greater than 0")
 		return
 	}
@@ -172,9 +176,9 @@ func handleFDISKCommand(input string) {
 		return
 	}
 
-	println("ADD", *add)
+	//println("ADD", *add)
 	// validate type equals to P/E/L
-	if *type_ != "p" && *type_ != "e" && *type_ != "l" && *delete != "full" && *add == 0{
+	if *type_ != "p" && *type_ != "e" && *type_ != "l" && *delete != "full" && *add == 0 {
 		fmt.Println("Error: Type must be (P/E/L)")
 		return
 	}
@@ -203,11 +207,29 @@ func handleFDISKCommand(input string) {
 }
 
 func handleMOUNTCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessMOUNT(input, driveletter, name)
+
+	// validate driveletter be a letter and not empty
+	if !functions_test.ValidDriveLetter(*driveletter) {
+		fmt.Println("Error: DriveLetter must be a letter")
+		return
+	} else if len(*driveletter) == 0 {
+		fmt.Println("Error: DriveLetter cannot be empty")
+		return
+	}
+
+	functions_test.MountPartition(driveletter, name)
+	*driveletter = ""
+	*name = ""
+
 }
 
 func handleUNMOUNTCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessUNMOUNT(input, id)
+
+	functions_test.UNMOUNT_Partition(id)
 }
 
 func handleMKFSCommand(input string) {

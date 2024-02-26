@@ -10,11 +10,14 @@ import (
 	"math/rand"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
 
 var fileCounter int = 0
+
+//?                          APLICACION DE COMANDOS
 
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO MKDISK                               */
@@ -53,7 +56,6 @@ func ProcessMKDISK(input string, size *int, fit *string, unit *string) {
 	if *unit == "" {
 		*unit = "m"
 	}
-
 }
 
 func CreateBinFile(size *int, fit *string, unit *string) {
@@ -228,11 +230,14 @@ func ProcessFDISK(input string, size *int, driveletter *string, name *string, un
 		if *fit == "" {
 			*fit = "w"
 		}
+		if *type_ == "" {
+			*type_ = "p"
+		}
 	}
 }
 
 func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string, type_ *string, fit *string, delete *string, add *int, path *string) {
-	println(*unit)
+	//println(*unit)
 
 	if *unit == "k" {
 		*size = *size * 1024
@@ -245,7 +250,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 		*add = *add * 1024 * 1024
 	}
 
-	println("Size partition: ", *size)
+	//println("Size partition: ", *size)
 
 	// Open bin file
 	*driveletter = strings.ToUpper(*driveletter)
@@ -276,17 +281,18 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 
 	//Validar si existe una particion extendida
 	var EPartition = false
+	var EPartitionStart int
 	for _, partition := range TempMBR.Mbr_particion {
 		if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) {
 			EPartition = true
-			fmt.Println("¡Existe una particion extendida!")
+			EPartitionStart = int(partition.Part_start)
+			//fmt.Println("¡Existe una particion extendida!")
 		}
 	}
-	println("EPartition: ", EPartition)
 
-	// Print object
-	fmt.Println(">>>>>ANTES")
-	structs_test.PrintMBR(TempMBR)
+	//? Print object
+	// fmt.Println(">>>>>ANTES")
+	// structs_test.PrintMBR(TempMBR)
 
 	var Partition structs_test.Partition
 	// Si la operación es de eliminación y se especifica eliminar completamente
@@ -299,7 +305,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 			}
 		}
 	} else if *add != 0 {
-		println("ADD", *add)
+		//println("ADD", *add)
 		// Añadir o quitar espacio en las particiones
 		for i := range TempMBR.Mbr_particion {
 			if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
@@ -347,8 +353,8 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 				}
 
 				suma := int32(*size) + int32(binary.Size(TempMBR))
-				println("Tamaño del disco:", TempMBR.Mbr_tamano)
-				println("Suma:", suma)
+				//println("Tamaño del disco:", TempMBR.Mbr_tamano)
+				//println("Suma:", suma)
 				if suma > TempMBR.Mbr_tamano {
 					println("Error: La particion exede el tamaño del disco!!!!!!!!!!!!!!!!!!")
 					return
@@ -365,14 +371,56 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 
 		// Validar que si no existe una particion extendida no se puede crear una logica
 		for _, partition := range TempMBR.Mbr_particion {
-			if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[2].Part_type[:]) {
+			if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[2].Part_type[:]) && *type_ == "l" {
+				fmt.Printf("Original: %s Comparacion: %s \n", partition.Part_type[:], compareMBR.Mbr_particion[2].Part_type[:])
 				if !EPartition {
 					println("Error: No se puede crear una parcicion logica si no existe una extendida!!!!!!!!!!!!!!!!!!!!!!!!!")
 					return
-				} else {
-					//De momento vamos a ignorar las particiones logicas
-					return
 				}
+				//?EBR verificacion
+				var x = 0
+				for x < 1 {
+					var TempEBR structs_test.EBR
+					if err := utilities_test.ReadObject(file, &TempEBR, int64(EPartitionStart)); err != nil {
+						return
+					}
+
+					if TempEBR.Part_s != 0 {
+						// Escribir un nuevo EBR en el archivo binario
+						var newEBR structs_test.EBR
+						copy(newEBR.Part_mount[:], "0")                                   // Indica si la partición está montada o no
+						copy(newEBR.Part_fit[:], "l")                                     // Tipo de ajuste de la partición
+						newEBR.Part_start = int32(EPartitionStart) + 1                    // Indica en qué byte del disco inicia la partición
+						newEBR.Part_s = TempEBR.Part_s                                    // Contiene el tamaño total de la partición en bytes
+						newEBR.Part_next = int32(EPartitionStart) + int32(TempEBR.Part_s) // Byte en el que está el próximo EBR (-1 si no hay siguiente)
+						copy(newEBR.Part_name[:], TempEBR.Part_name[:])                   // Nombre de la partición
+
+						// Escribir el nuevo EBR en el archivo binario
+						if err := utilities_test.WriteObject(file, newEBR, int64(EPartitionStart)); err != nil {
+							return
+						}
+						EPartitionStart = EPartitionStart + int(TempEBR.Part_s)
+						structs_test.PrintEBR(newEBR)
+					} else {
+						// Escribir un nuevo EBR en el archivo binario
+						var newEBR structs_test.EBR
+						copy(newEBR.Part_mount[:], "0")                // Indica si la partición está montada o no
+						copy(newEBR.Part_fit[:], "l")                  // Tipo de ajuste de la partición
+						newEBR.Part_start = int32(EPartitionStart) + 1 // Indica en qué byte del disco inicia la partición
+						newEBR.Part_s = int32(*size)                   // Contiene el tamaño total de la partición en bytes
+						newEBR.Part_next = -1                          // Byte en el que está el próximo EBR (-1 si no hay siguiente)
+						copy(newEBR.Part_name[:], *name)               // Nombre de la partición
+
+						// Escribir el nuevo EBR en el archivo binario
+						if err := utilities_test.WriteObject(file, newEBR, int64(EPartitionStart)); err != nil {
+							return
+						}
+						x = 1
+						structs_test.PrintEBR(newEBR)
+					}
+
+				}
+				break
 			}
 		}
 
@@ -404,12 +452,139 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 	}
 
 	// Print object
-	fmt.Println(">>>>>DESPUES")
-	structs_test.PrintMBR(TempMBR2)
+	// fmt.Println(">>>>>DESPUES")
+	// structs_test.PrintMBR(TempMBR2)
 
 	// Close bin file
 	defer file.Close()
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                COMANDO MOUNT                               */
+/* -------------------------------------------------------------------------- */
+
+func ProcessMOUNT(input string, driveletter *string, name *string) {
+	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
+	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
+	matches := re.FindAllStringSubmatch(input, -1)
+
+	for _, match := range matches {
+		flagName := match[1]
+		flagValue := match[2]
+
+		// Delete quotes if they are present in the value
+		flagValue = strings.Trim(flagValue, "\"")
+		switch flagName {
+		case "driveletter":
+			*driveletter = flagValue
+		case "name":
+			*name = flagValue
+		default:
+			fmt.Println("Error: Flag not found")
+		}
+	}
+}
+
+func MountPartition(driveletter *string, name *string) {
+	// Open bin file
+	*driveletter = strings.ToUpper(*driveletter)
+	filepath := "./Disks/" + *driveletter + ".dsk"
+	file, err := utilities_test.OpenFile(filepath)
+	if err != nil {
+		return
+	}
+
+	var TempMBR structs_test.MBR
+	// Read object from bin file
+	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
+		return
+	}
+
+	var compareMBR structs_test.MBR
+	copy(compareMBR.Mbr_particion[0].Part_name[:], *name)
+
+	for i := 0; i < 4; i++ {
+
+		if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
+			println("entro a la igualacion")
+			copy(TempMBR.Mbr_particion[i].Part_status[:], "1")
+			ID := fmt.Sprintf("%s%d%s", *driveletter, TempMBR.Mbr_particion[i].Part_correlative, "02")
+			println(ID)
+			copy(TempMBR.Mbr_particion[i].Part_id[:], ID)
+			break
+		}
+	}
+
+	// Overwrite the MBR
+	if err := utilities_test.WriteObject(file, TempMBR, 0); err != nil {
+		return
+	}
+
+	structs_test.PrintMBR(TempMBR)
+}
+
+/* -------------------------------------------------------------------------- */
+/*                               COMANDO UNMOUNT                              */
+/* -------------------------------------------------------------------------- */
+
+func ProcessUNMOUNT(input string, id *string) {
+	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
+	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
+	match := re.FindStringSubmatch(input)
+	if len(match) != 3 {
+		fmt.Println("Comando unmount incorrecto")
+		return
+	}
+	flagValue := match[2]
+	*id = flagValue
+
+}
+
+func UNMOUNT_Partition(id *string) {
+	letra := string((*id)[0])
+	letra = strings.ToUpper(letra)
+
+	correlativo, err := strconv.ParseInt(string((*id)[len(*id)-3]), 10, 32)
+	if err != nil {
+		fmt.Println("Error al convertir la cadena a int32:", err)
+		return
+	}
+	filepath := "./Disks/" + letra + ".dsk"
+	file, err := utilities_test.OpenFile(filepath)
+	if err != nil {
+		return
+	}
+
+	var TempMBR structs_test.MBR
+	// Read object from bin file
+	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
+		return
+	}
+
+	var compareMBR structs_test.MBR
+	compareMBR.Mbr_particion[0].Part_correlative = int32(correlativo)
+
+	for i := 0; i < 4; i++ {
+
+		if TempMBR.Mbr_particion[i].Part_correlative == compareMBR.Mbr_particion[0].Part_correlative {
+			println("entro a la igualacion")
+			copy(TempMBR.Mbr_particion[i].Part_status[:], "0")
+			break
+		}
+	}
+
+	// Overwrite the MBR
+	if err := utilities_test.WriteObject(file, TempMBR, 0); err != nil {
+		return
+	}
+
+	structs_test.PrintMBR(TempMBR)
+
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                COMANDO MKFS                                */
+/* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO EXECUTE                              */
