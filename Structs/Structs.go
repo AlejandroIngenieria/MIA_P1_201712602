@@ -50,7 +50,8 @@ func PrintPartition(data Partition) {
 	fmt.Printf("Name: %s, type: %s, start: %d, size: %d, status: %s, id: %s\n", 
 	string(data.Part_name[:]), 
 	string(data.Part_type[:]), 
-	data.Part_start, data.Part_size, 
+	data.Part_start, 
+	data.Part_size, 
 	string(data.Part_status[:]), 
 	string(data.Part_id[:]))
 }
@@ -66,6 +67,7 @@ type EBR struct {
 }
 
 func PrintEBR(data EBR) {
+	
 	fmt.Printf("MOUNT: %s FIT: %s START: %d SIZE: %d NEXT: %d NAME: %s \n",
 		string(data.Part_mount[:]),
 		string(data.Part_fit[:]),

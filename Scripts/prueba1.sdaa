@@ -12,7 +12,7 @@ mkdisk -size=10
 #FDISK
 #Crea una partición primaria llamada Particion1 de 300 kb
 #con el peor ajuste en el disco A.dsk
-#fdisk -size=300 -driveletter=A -name=Particion1
+fdisk -size=300 -driveletter=A -name=Particion1
 #fdisk -size=300 -driveletter=A -name=Particion1
 
 #Crea una partición extendida dentro del disco B.dsk de 300 kb

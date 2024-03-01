@@ -392,64 +392,55 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 			}
 		}
 
-		// Validar que si no existe una particion extendida no se puede crear una logica
-		for _, partition := range TempMBR.Mbr_particion {
-			if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[2].Part_type[:]) && *type_ == "l" {
-				//fmt.Printf("Original: %s Comparacion: %s \n", partition.Part_type[:], compareMBR.Mbr_particion[2].Part_type[:])
-				if !EPartition {
-					println("Error: No se puede crear una parcicion logica si no existe una extendida!")
+		if EPartition && *type_ == "l" {
+			//?EBR verificacion
+			var x = 0
+			for x < 1 {
+				var TempEBR structs_test.EBR
+				if err := utilities_test.ReadObject(file, &TempEBR, int64(EPartitionStart)); err != nil {
 					return
 				}
-				//?EBR verificacion
-				var x = 0
-				for x < 1 {
-					var TempEBR structs_test.EBR
-					if err := utilities_test.ReadObject(file, &TempEBR, int64(EPartitionStart)); err != nil {
+
+				if TempEBR.Part_s != 0 {
+					// Escribir un nuevo EBR en el archivo binario
+					var newEBR structs_test.EBR
+					copy(newEBR.Part_mount[:], "0")                                   // Indica si la partición está montada o no
+					copy(newEBR.Part_fit[:], "l")                                     // Tipo de ajuste de la partición
+					newEBR.Part_start = int32(EPartitionStart) + 1                    // Indica en qué byte del disco inicia la partición
+					newEBR.Part_s = TempEBR.Part_s                                    // Contiene el tamaño total de la partición en bytes
+					newEBR.Part_next = int32(EPartitionStart) + int32(TempEBR.Part_s) // Byte en el que está el próximo EBR (-1 si no hay siguiente)
+					copy(newEBR.Part_name[:], TempEBR.Part_name[:])                   // Nombre de la partición
+
+					// Escribir el nuevo EBR en el archivo binario
+					if err := utilities_test.WriteObject(file, newEBR, int64(EPartitionStart)); err != nil {
 						return
 					}
+					EPartitionStart = EPartitionStart + int(TempEBR.Part_s)
+					structs_test.PrintEBR(newEBR)
+				} else {
+					// Escribir un nuevo EBR en el archivo binario
+					var newEBR structs_test.EBR
+					copy(newEBR.Part_mount[:], "0")                // Indica si la partición está montada o no
+					copy(newEBR.Part_fit[:], "l")                  // Tipo de ajuste de la partición
+					newEBR.Part_start = int32(EPartitionStart) + 1 // Indica en qué byte del disco inicia la partición
+					newEBR.Part_s = int32(*size)                   // Contiene el tamaño total de la partición en bytes
+					newEBR.Part_next = -1                          // Byte en el que está el próximo EBR (-1 si no hay siguiente)
+					copy(newEBR.Part_name[:], *name)               // Nombre de la partición
 
-					if TempEBR.Part_s != 0 {
-						// Escribir un nuevo EBR en el archivo binario
-						var newEBR structs_test.EBR
-						copy(newEBR.Part_mount[:], "0")                                   // Indica si la partición está montada o no
-						copy(newEBR.Part_fit[:], "l")                                     // Tipo de ajuste de la partición
-						newEBR.Part_start = int32(EPartitionStart) + 1                    // Indica en qué byte del disco inicia la partición
-						newEBR.Part_s = TempEBR.Part_s                                    // Contiene el tamaño total de la partición en bytes
-						newEBR.Part_next = int32(EPartitionStart) + int32(TempEBR.Part_s) // Byte en el que está el próximo EBR (-1 si no hay siguiente)
-						copy(newEBR.Part_name[:], TempEBR.Part_name[:])                   // Nombre de la partición
-
-						// Escribir el nuevo EBR en el archivo binario
-						if err := utilities_test.WriteObject(file, newEBR, int64(EPartitionStart)); err != nil {
-							return
-						}
-						EPartitionStart = EPartitionStart + int(TempEBR.Part_s)
-						structs_test.PrintEBR(newEBR)
-					} else {
-						// Escribir un nuevo EBR en el archivo binario
-						var newEBR structs_test.EBR
-						copy(newEBR.Part_mount[:], "0")                // Indica si la partición está montada o no
-						copy(newEBR.Part_fit[:], "l")                  // Tipo de ajuste de la partición
-						newEBR.Part_start = int32(EPartitionStart) + 1 // Indica en qué byte del disco inicia la partición
-						newEBR.Part_s = int32(*size)                   // Contiene el tamaño total de la partición en bytes
-						newEBR.Part_next = -1                          // Byte en el que está el próximo EBR (-1 si no hay siguiente)
-						copy(newEBR.Part_name[:], *name)               // Nombre de la partición
-
-						// Escribir el nuevo EBR en el archivo binario
-						if err := utilities_test.WriteObject(file, newEBR, int64(EPartitionStart)); err != nil {
-							return
-						}
-						x = 1
-						structs_test.PrintEBR(newEBR)
-						suma := newEBR.Part_start + newEBR.Part_s
-						if suma > ELimit {
-							println("Error: la particion logica supera el tamaño de la particion extendida")
-							return
-						}
+					// Escribir el nuevo EBR en el archivo binario
+					if err := utilities_test.WriteObject(file, newEBR, int64(EPartitionStart)); err != nil {
+						return
 					}
-
+					structs_test.PrintEBR(newEBR)
+					suma := newEBR.Part_start + newEBR.Part_s
+					if suma > ELimit {
+						println("Error: la particion logica supera el tamaño de la particion extendida")
+						return
+					}
+					x = 1
 				}
-				return
 			}
+			return
 		}
 
 		// Validar que no exista mas de 1 particion extendida por disco
@@ -460,7 +451,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 					Ecount += 1
 				}
 				if Ecount > 1 {
-					println("Error: No se puede tener mas de 1 particion extendida por disco!!!!!!!!!!!!!!!!!!!!")
+					println("Error: No se puede tener mas de 1 particion extendida por disco!")
 					return
 				}
 			}
@@ -574,6 +565,7 @@ func MountPartition(driveletter *string, name *string) {
 				if TempEBR.Part_s != 0 {
 					if bytes.Equal(TempEBR.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
 						copy(TempEBR.Part_mount[:], "1") // Cambia a 1 (montada) es estado de la particion
+
 					}
 					// Escribir el nuevo EBR en el archivo binario
 					if err := utilities_test.WriteObject(file, TempEBR, int64(EPartitionStart)); err != nil {
@@ -639,7 +631,7 @@ func UNMOUNT_Partition(id *string) {
 	for i := 0; i < 4; i++ {
 
 		if TempMBR.Mbr_particion[i].Part_correlative == compareMBR.Mbr_particion[0].Part_correlative {
-			println("entro a la igualacion")
+			//println("entro a la igualacion")
 			copy(TempMBR.Mbr_particion[i].Part_status[:], "0")
 			break
 		}
@@ -929,7 +921,7 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 		fmt.Println("Error: ", err)
 	}
 
-	//mkfs -type=full -id=A119
+	//mkfs -type=full -id=A102
 }
 
 func create_ext3() {
@@ -1016,41 +1008,6 @@ func create_ext3() {
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO PAUSE                               */
-/* -------------------------------------------------------------------------- */
-
-//?                     			REPORTES
-/* -------------------------------------------------------------------------- */
-/*                                 REPORTE MBR                                */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                                REPORTE DISK                                */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                                REPORTE INODE                               */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                                REPORTE BLOCK                               */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                              REPORTE BM_INODE                              */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                               REPORTE BM_BLOC                              */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                                REPORTE TREE                                */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                                 REPORTE SB                                 */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                                REPORTE FILE                                */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                                 REPORTE LS                                 */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                             REPORTE JOURNALING                             */
 /* -------------------------------------------------------------------------- */
 
 func ProcessExecute(input string, path *string) {

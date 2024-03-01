@@ -74,7 +74,7 @@ func Command(input string) {
 	case strings.HasPrefix(input, "chmod"):
 		handleCHMODCommand(comando)
 	case strings.HasPrefix(input, "pause"):
-		handlePAUSECommand(comando)
+		handlePAUSECommand()
 	case strings.HasPrefix(input, "execute"):
 		handleEXECUTECommand(comando)
 	case strings.HasPrefix(input, "rep"):
@@ -96,7 +96,8 @@ var (
 	add         = flag.Int("add", 0, "Añadir/Quitar")
 	path        = flag.String("path", "", "Directorio")
 	id          = flag.String("id", "", "ID")
-	fs          = flag.String("", "", "")
+	fs          = flag.String("fs", "", "FDISK")
+	ruta        = flag.String("ruta", "", "Ruta")
 )
 
 func handleMKDISKCommand(input string) {
@@ -236,16 +237,16 @@ func handleUNMOUNTCommand(input string) {
 func handleMKFSCommand(input string) {
 	flag.Parse()
 	functions_test.ProcessMKFS(input, id, type_, fs)
-	
+
 	if *id == "" {
 		println("Error: id cannot be empty")
 	}
-	
-	if *fs != "2fs" && *fs != "3fs"{
+
+	if *fs != "2fs" && *fs != "3fs" {
 		println("Error: fs must be 2fs or 3fs")
 	}
 
-	
+	functions_test.MKFS(id, type_, fs)
 }
 
 func handleLOGINCommand(input string) {
@@ -320,8 +321,10 @@ func handleCHMODCommand(input string) {
 	panic("unimplemented")
 }
 
-func handlePAUSECommand(input string) {
-	panic("unimplemented")
+func handlePAUSECommand() {
+	fmt.Println("Presione cualquier tecla para continuar...")
+	fmt.Scanln() // Espera a que el usuario presione Enter
+	fmt.Println("Continuando la ejecución...")
 }
 
 func handleEXECUTECommand(input string) {
@@ -357,6 +360,14 @@ func handleEXECUTECommand(input string) {
 	*path = ""
 }
 
-func handleREPCommand(comando string) {
-	panic("unimplemented")
+func handleREPCommand(input string) {
+	flag.Parse()
+	functions_test.ProcessREP(input, name, path, id, ruta)
+
+	if *name == "" || *path == "" || *id == "" {
+		println("Error: incomplete statements")
+		return
+	}
+
+	functions_test.GenerateReports(name, path, id, ruta)
 }
