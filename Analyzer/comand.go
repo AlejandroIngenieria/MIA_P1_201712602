@@ -95,7 +95,8 @@ var (
 	delete      = flag.String("delete", "", "Eliminar")
 	add         = flag.Int("add", 0, "Añadir/Quitar")
 	path        = flag.String("path", "", "Directorio")
-	id        = flag.String("id", "", "ID")
+	id          = flag.String("id", "", "ID")
+	fs          = flag.String("", "", "")
 )
 
 func handleMKDISKCommand(input string) {
@@ -233,7 +234,18 @@ func handleUNMOUNTCommand(input string) {
 }
 
 func handleMKFSCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessMKFS(input, id, type_, fs)
+	
+	if *id == "" {
+		println("Error: id cannot be empty")
+	}
+	
+	if *fs != "2fs" && *fs != "3fs"{
+		println("Error: fs must be 2fs or 3fs")
+	}
+
+	
 }
 
 func handleLOGINCommand(input string) {

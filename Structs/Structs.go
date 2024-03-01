@@ -14,7 +14,11 @@ type MBR struct {
 }
 
 func PrintMBR(data MBR) {
-	fmt.Printf("CreationDate: %s, fit: %s, size: %d \n", string(data.Mbr_fecha_creacion[:]), string(data.Dsk_fit[:]), data.Mbr_tamano)
+	fmt.Printf("CreationDate: %s, fit: %s, size: %d \n", 
+	string(data.Mbr_fecha_creacion[:]), 
+	string(data.Dsk_fit[:]), 
+	data.Mbr_tamano)
+	
 	for i := 0; i < 4; i++ {
 		fmt.Printf("Partition %d, Name: %s, Tipo: %s, Start: %d, Size: %d Status %s Correlativo %d ID %s CORRELATIVE: %d \n",
 			i,
@@ -40,6 +44,15 @@ type Partition struct {
 	Part_name        [16]byte
 	Part_correlative int32
 	Part_id          [4]byte
+}
+
+func PrintPartition(data Partition) {
+	fmt.Printf("Name: %s, type: %s, start: %d, size: %d, status: %s, id: %s\n", 
+	string(data.Part_name[:]), 
+	string(data.Part_type[:]), 
+	data.Part_start, data.Part_size, 
+	string(data.Part_status[:]), 
+	string(data.Part_id[:]))
 }
 
 // Extended Boot Record (EBR)
@@ -71,8 +84,8 @@ type S_block struct {
 	S_blocks_count      int32
 	S_free_blocks_count int32
 	S_free_inodes_count int32
-	S_mtime             [10]byte
-	S_umtime            [10]byte
+	S_mtime             [17]byte
+	S_umtime            [17]byte
 	S_mnt_count         int32
 	S_magic             int32
 	S_inode_s           int32
@@ -90,18 +103,18 @@ type Inode struct {
 	I_uid   int32
 	I_gid   int32
 	I_s     int32
-	I_atime [10]byte
-	I_ctime [10]byte
-	I_mtime [10]byte
-	I_block int32
+	I_atime [17]byte
+	I_ctime [17]byte
+	I_mtime [17]byte
+	I_block [15]int32
 	I_type  [1]byte
 	I_perm  [3]byte
 }
 
 // ? BLOQUES
-// Bloque de carpetas
-type B_files struct {
-	B_content [4]Content
+// Bloque de archivos
+type B_docs struct {
+	B_content [64]byte
 }
 
 type Content struct {
@@ -109,12 +122,27 @@ type Content struct {
 	B_inodo int32
 }
 
-// Bloque de archivos
-type B_docs struct {
-	B_content [64]byte
+// Bloque de carpetas
+type B_files struct {
+	B_content [4]Content
 }
 
 // Bloque de apuntadores
 type B_pointer struct {
 	B_pointers [16]int
+}
+
+// Contenido de Journaling
+type Content_J struct {
+	Operation [10]byte
+	Path      [100]byte
+	Content   [100]byte
+	Date      [17]byte
+}
+
+// Journaling
+type Journaling struct {
+	Size      int32
+	Ultimo    int32
+	Contenido [50]Content_J
 }
