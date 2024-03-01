@@ -273,7 +273,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 	// Verificar si el nombre de la partición ya está en uso
 	for _, partition := range TempMBR.Mbr_particion {
 		if bytes.Equal(partition.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) && *delete == "" && *add == 0 {
-			fmt.Println("Error: El nombre de la partición ya está en uso!!!!!!!!!!!!!!!!!!!!!!!!!!")
+			fmt.Println("Error: El nombre de la partición ya está en uso!")
 			return
 		}
 	}
@@ -281,10 +281,16 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 	//Validar si existe una particion extendida
 	var EPartition = false
 	var EPartitionStart int
+	var ELimit int32
 	for _, partition := range TempMBR.Mbr_particion {
 		if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) {
 			EPartition = true
 			EPartitionStart = int(partition.Part_start)
+			// println("Tamaño de la particion ", partition.Part_size)
+			// println("Tipo de particion ", string(partition.Part_type[:]))
+			// println("Start de particion ", partition.Part_start)
+			ELimit = partition.Part_start + partition.Part_size
+			//println("Fin de particion ", partition.Part_start + partition.Part_size)
 			//fmt.Println("¡Existe una particion extendida!")
 		}
 	}
@@ -295,14 +301,29 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 
 	var Partition structs_test.Partition
 	// Si la operación es de eliminación y se especifica eliminar completamente
+
+	//?------------------------------------------------------DELETE
+
 	if *delete == "full" {
+		encontrada := false
 		// Buscar la partición por nombre y eliminarla
 		for i := range TempMBR.Mbr_particion {
 			if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
 				TempMBR.Mbr_particion[i] = Partition // Vaciar la partición
+				encontrada = true
 				break
 			}
 		}
+
+		if encontrada {
+			fmt.Printf("Particion: %s eliminada\n", *name)
+		} else {
+			println("Error: no se encontro la particion")
+			println("Error: no se logro eliminar")
+		}
+
+		//?-------------------------------------------------------ADD
+
 	} else if *add != 0 {
 		//println("ADD", *add)
 		// Añadir o quitar espacio en las particiones
@@ -328,6 +349,9 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 				break
 			}
 		}
+
+		//?-----------------------------------------------------CREATE
+
 	} else {
 		var count = 0
 		var gap = int32(0)
@@ -355,7 +379,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 				//println("Tamaño del disco:", TempMBR.Mbr_tamano)
 				//println("Suma:", suma)
 				if suma > TempMBR.Mbr_tamano {
-					println("Error: La particion exede el tamaño del disco!!!!!!!!!!!!!!!!!!")
+					println("Error: La particion exede el tamaño del disco!")
 					return
 				}
 
@@ -371,9 +395,9 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 		// Validar que si no existe una particion extendida no se puede crear una logica
 		for _, partition := range TempMBR.Mbr_particion {
 			if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[2].Part_type[:]) && *type_ == "l" {
-				fmt.Printf("Original: %s Comparacion: %s \n", partition.Part_type[:], compareMBR.Mbr_particion[2].Part_type[:])
+				//fmt.Printf("Original: %s Comparacion: %s \n", partition.Part_type[:], compareMBR.Mbr_particion[2].Part_type[:])
 				if !EPartition {
-					println("Error: No se puede crear una parcicion logica si no existe una extendida!!!!!!!!!!!!!!!!!!!!!!!!!")
+					println("Error: No se puede crear una parcicion logica si no existe una extendida!")
 					return
 				}
 				//?EBR verificacion
@@ -416,10 +440,15 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 						}
 						x = 1
 						structs_test.PrintEBR(newEBR)
+						suma := newEBR.Part_start + newEBR.Part_s
+						if suma > ELimit {
+							println("Error: la particion logica supera el tamaño de la particion extendida")
+							return
+						}
 					}
 
 				}
-				break
+				return
 			}
 		}
 
@@ -499,18 +528,63 @@ func MountPartition(driveletter *string, name *string) {
 		return
 	}
 
+	encontrada := false
+
 	var compareMBR structs_test.MBR
 	copy(compareMBR.Mbr_particion[0].Part_name[:], *name)
+	copy(compareMBR.Mbr_particion[0].Part_type[:], "p")
+	copy(compareMBR.Mbr_particion[1].Part_type[:], "e")
+	copy(compareMBR.Mbr_particion[2].Part_type[:], "l")
 
 	for i := 0; i < 4; i++ {
 
 		if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
-			println("entro a la igualacion")
+			//println("entro a la igualacion")
+			encontrada = true
 			copy(TempMBR.Mbr_particion[i].Part_status[:], "1")
 			ID := fmt.Sprintf("%s%d%s", *driveletter, TempMBR.Mbr_particion[i].Part_correlative, "02")
 			println(ID)
 			copy(TempMBR.Mbr_particion[i].Part_id[:], ID)
 			break
+		}
+	}
+
+	//Validar si existe una particion extendida
+	var EPartition = false
+	var EPartitionStart int
+	for _, partition := range TempMBR.Mbr_particion {
+		if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) {
+			EPartition = true
+			EPartitionStart = int(partition.Part_start)
+		}
+	}
+
+	//?EBR verificacion
+	if !encontrada && EPartition {
+		// Validar que si no existe una particion extendida no se puede crear una logica
+		for i := 0; i < 4; i++ {
+			//?EBR verificacion
+			var x = 0
+			for x < 1 {
+				var TempEBR structs_test.EBR
+				if err := utilities_test.ReadObject(file, &TempEBR, int64(EPartitionStart)); err != nil {
+					return
+				}
+
+				if TempEBR.Part_s != 0 {
+					if bytes.Equal(TempEBR.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
+						copy(TempEBR.Part_mount[:], "1") // Cambia a 1 (montada) es estado de la particion
+					}
+					// Escribir el nuevo EBR en el archivo binario
+					if err := utilities_test.WriteObject(file, TempEBR, int64(EPartitionStart)); err != nil {
+						return
+					}
+					structs_test.PrintEBR(TempEBR)
+					EPartitionStart = int(TempEBR.Part_next)
+				} else {
+					x = 1
+				}
+			}
 		}
 	}
 
@@ -858,8 +932,8 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	//mkfs -type=full -id=A119
 }
 
-func create_ext3()  {
-	
+func create_ext3() {
+
 }
 
 //?                    ADMINISTRACION DE USUARIOS Y GRUPOS

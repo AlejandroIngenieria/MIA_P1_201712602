@@ -14,10 +14,10 @@ fdisk -size=300 -driveletter=A -name=Particion1
 fdisk -type=E -driveletter=A -unit=K -name=Particion2 -size=800
 
 #Creacion de particiones logicas (EBR)
-#fdisk -type=L -driveletter=A -unit=K -name=ParticionA -size=200
-#fdisk -type=L -driveletter=A -unit=K -name=ParticionB -size=200
-#fdisk -type=L -driveletter=A -unit=K -name=ParticionC -size=200
-#fdisk -type=L -driveletter=A -unit=K -name=ParticionD -size=200
+fdisk -type=L -driveletter=A -unit=K -name=ParticionA -size=200
+fdisk -type=L -driveletter=A -unit=K -name=ParticionB -size=200
+fdisk -type=L -driveletter=A -unit=K -name=ParticionC -size=200
+fdisk -type=L -driveletter=A -unit=K -name=ParticionD -size=100
 
 fdisk -type=P -driveletter=A -unit=K -name=Particion3 -size=800
 fdisk -type=P -driveletter=A -unit=K -name=Particion4 -size=800
@@ -29,9 +29,11 @@ fdisk -type=P -driveletter=A -unit=K -name=Particion4 -size=800
 #Canet Ejemplo -> 201712602
 mount -driveletter=A -name=Particion1
 mount -driveletter=A -name=Particion3
+mount -driveletter=A -name=ParticionA
+mount -driveletter=A -name=ParticionC
 
 #UNMOUNT
 #Desmonta la partición con id A118 (En el disco A, partición con correlativo 1)
-unmount -id=A102
+#unmount -id=A102
 #Si no existe, se debe mostrar error
 #unmount -id=AX18
