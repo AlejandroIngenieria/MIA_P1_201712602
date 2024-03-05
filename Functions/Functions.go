@@ -465,7 +465,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 					// Escribir un nuevo EBR en el archivo binario
 					var newEBR structs_test.EBR
 					copy(newEBR.Part_mount[:], "0")                                   // Indica si la partición está montada o no
-					copy(newEBR.Part_fit[:], *fit)                                     // Tipo de ajuste de la partición
+					copy(newEBR.Part_fit[:], *fit)                                    // Tipo de ajuste de la partición
 					newEBR.Part_start = int32(EPartitionStart) + 1                    // Indica en qué byte del disco inicia la partición
 					newEBR.Part_s = TempEBR.Part_s                                    // Contiene el tamaño total de la partición en bytes
 					newEBR.Part_next = int32(EPartitionStart) + int32(TempEBR.Part_s) // Byte en el que está el próximo EBR (-1 si no hay siguiente)
@@ -481,7 +481,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 					// Escribir un nuevo EBR en el archivo binario
 					var newEBR structs_test.EBR
 					copy(newEBR.Part_mount[:], "0")                // Indica si la partición está montada o no
-					copy(newEBR.Part_fit[:], *fit)                  // Tipo de ajuste de la partición
+					copy(newEBR.Part_fit[:], *fit)                 // Tipo de ajuste de la partición
 					newEBR.Part_start = int32(EPartitionStart) + 1 // Indica en qué byte del disco inicia la partición
 					newEBR.Part_s = int32(*size)                   // Contiene el tamaño total de la partición en bytes
 					newEBR.Part_next = -1                          // Byte en el que está el próximo EBR (-1 si no hay siguiente)
@@ -759,6 +759,13 @@ func ProcessMKFS(input string, id *string, type_ *string, fs *string) {
 		default:
 			fmt.Println("Error: Flag not found: " + flagName)
 		}
+
+		if *type_ == "" {
+			*type_ = "full"
+		}
+		if *fs == "" {
+			*fs = "2fs"
+		}
 	}
 }
 
@@ -811,49 +818,64 @@ func MKFS(id *string, type_ *string, fs *string) {
 		return
 	}
 
-	// numerador = (partition_montada.size - sizeof(Structs::Superblock)
-	// denominador base = (4 + sizeof(Structs::Inodes) + 3 * sizeof(Structs::Fileblock))
-	// temp = "2" ? 0 : sizeof(Structs::Journaling)
-	// denominador = base + temp
-	// n = floor(numerador / denrominador)
-
-	numerador := int32(TempMBR.Mbr_particion[index].Part_size - int32(binary.Size(structs_test.S_block{})))
-	denominador_base := int32(4 + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.B_files{})))
-	var temp int32 = 0
 	if *fs == "2fs" {
-		temp = 0
-	} else {
-		temp = int32(binary.Size(structs_test.Journaling{}))
-	}
-	denominador := denominador_base + temp
-	n := int32(numerador / denominador)
+		numerador := int32(TempMBR.Mbr_particion[index].Part_size - int32(binary.Size(structs_test.S_block{})))
+		denominador := int32(4 + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.B_files{})))
+		n := int32(numerador / denominador)
 
-	fmt.Println("N:", n)
+		fmt.Println("N:", n)
 
-	// var newMRB Structs.MRB
-	var newSuperblock structs_test.S_block
-	newSuperblock.S_inodes_count = 0
-	newSuperblock.S_blocks_count = 0
+		// var newMRB Structs.MRB
+		var newSuperblock structs_test.S_block
+		newSuperblock.S_inodes_count = 0
+		newSuperblock.S_blocks_count = 0
 
-	newSuperblock.S_free_blocks_count = 3 * n
-	newSuperblock.S_free_inodes_count = n
+		newSuperblock.S_free_blocks_count = 3 * n
+		newSuperblock.S_free_inodes_count = n
 
-	// Obtener la marca de tiempo actual
-	currentTime := time.Now()
+		// Obtener la marca de tiempo actual
+		currentTime := time.Now()
 
-	// Formatear la marca de tiempo como una cadena
-	timeString := currentTime.Format("2006-01-02 15:04:05")
+		// Formatear la marca de tiempo como una cadena
+		timeString := currentTime.Format("2006-01-02 15:04:05")
 
-	// Convertir la cadena a un slice de bytes
-	timeBytes := []byte(timeString)
+		// Convertir la cadena a un slice de bytes
+		timeBytes := []byte(timeString)
 
-	copy(newSuperblock.S_mtime[:], timeBytes)
-	copy(newSuperblock.S_umtime[:], timeBytes)
-	newSuperblock.S_mnt_count = 0
-
-	if *fs == "2fs" {
+		copy(newSuperblock.S_mtime[:], timeBytes)
+		copy(newSuperblock.S_umtime[:], timeBytes)
+		newSuperblock.S_mnt_count = 0
 		create_ext2(n, TempMBR.Mbr_particion[index], newSuperblock, timeString, file)
 	} else {
+		numerador := int32(TempMBR.Mbr_particion[index].Part_size - int32(binary.Size(structs_test.S_block{})))
+		denominador := int32(4 + int32(binary.Size(structs_test.Journaling{})) + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.B_files{})))
+		
+		n := int32(numerador / denominador)
+
+		fmt.Println("N:", n)
+
+		// var newMRB Structs.MRB
+		var newSuperblock structs_test.S_block
+		var newJournaling structs_test.Journaling
+		newSuperblock.S_inodes_count = 0
+		newSuperblock.S_blocks_count = 0
+
+		newSuperblock.S_free_blocks_count = 3 * n
+		newSuperblock.S_free_inodes_count = n
+		newJournaling.Size = n
+
+		// Obtener la marca de tiempo actual
+		currentTime := time.Now()
+
+		// Formatear la marca de tiempo como una cadena
+		timeString := currentTime.Format("2006-01-02 15:04:05")
+
+		// Convertir la cadena a un slice de bytes
+		timeBytes := []byte(timeString)
+
+		copy(newSuperblock.S_mtime[:], timeBytes)
+		copy(newSuperblock.S_umtime[:], timeBytes)
+		newSuperblock.S_mnt_count = 0
 		create_ext3(n, TempMBR.Mbr_particion[index], newSuperblock, timeString, file)
 	}
 
@@ -938,8 +960,8 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	copy(Folderblock0.B_content[0].B_name[:], ".")
 	Folderblock0.B_content[1].B_inodo = 0
 	copy(Folderblock0.B_content[1].B_name[:], "..")
-	Folderblock0.B_content[1].B_inodo = 1
-	copy(Folderblock0.B_content[1].B_name[:], "users.txt")
+	Folderblock0.B_content[2].B_inodo = 1
+	copy(Folderblock0.B_content[2].B_name[:], "users.txt")
 
 	var Inode1 structs_test.Inode //Inode 1
 	Inode1.I_uid = 1
