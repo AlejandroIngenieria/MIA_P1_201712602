@@ -133,18 +133,17 @@ func REPORT_MBR(id *string, path *string) {
 		//?EBR verificacion
 		if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) && EPartition {
 			// Validar que si no existe una particion extendida no se puede crear una logica
-			for i := 0; i < 4; i++ {
-				//?EBR verificacion
-				var x = 0
-				for x < 1 {
-					var TempEBR structs_test.EBR
-					if err := utilities_test.ReadObject(file, &TempEBR, int64(EPartitionStart)); err != nil {
-						return
-					}
+			//?EBR verificacion
+			var x = 0
+			for x < 1 {
+				var TempEBR structs_test.EBR
+				if err := utilities_test.ReadObject(file, &TempEBR, int64(EPartitionStart)); err != nil {
+					return
+				}
 
-					if EPartitionStart != 0 && TempEBR.Part_next != -1 {
-						partNameClean := strings.Trim(string(TempEBR.Part_name[:]), "\x00")
-						strE += fmt.Sprintf(`
+				if EPartitionStart != 0 && TempEBR.Part_next != -1 {
+					partNameClean := strings.Trim(string(TempEBR.Part_name[:]), "\x00")
+					strE += fmt.Sprintf(`
 		|Particion Logica
 		|{part_status|%s}
 		|{part_next|%d}
@@ -152,20 +151,40 @@ func REPORT_MBR(id *string, path *string) {
 		|{part_start|%d}
 		|{part_size|%d}
 		|{part_name|%s}`,
-							TempEBR.Part_mount[:],
-							TempEBR.Part_next,
-							TempEBR.Part_fit[:],
-							TempEBR.Part_start,
-							TempEBR.Part_s,
-							partNameClean,
-						)
-						EPartitionStart = int(TempEBR.Part_next)
-					} else {
-						strP += strE
-						x = 1
-					}
+						string(TempEBR.Part_mount[:]),
+						TempEBR.Part_next,
+						string(TempEBR.Part_fit[:]),
+						TempEBR.Part_start,
+						TempEBR.Part_s,
+						partNameClean,
+					)
+					print("fit logica")
+					println(string(TempEBR.Part_fit[:]))
+					EPartitionStart = int(TempEBR.Part_next)
+				} else {
+					print("fit logica")
+					println(string(TempEBR.Part_fit[:]))
+					partNameClean := strings.Trim(string(TempEBR.Part_name[:]), "\x00")
+					strE += fmt.Sprintf(`
+		|Particion Logica
+		|{part_status|%s}
+		|{part_next|%d}
+		|{part_fit|%s}
+		|{part_start|%d}
+		|{part_size|%d}
+		|{part_name|%s}`,
+						string(TempEBR.Part_mount[:]),
+						TempEBR.Part_next,
+						string(TempEBR.Part_fit[:]),
+						TempEBR.Part_start,
+						TempEBR.Part_s,
+						partNameClean,
+					)
+					strP += strE
+					x = 1
 				}
 			}
+
 		}
 
 	}
@@ -209,30 +228,8 @@ func REPORT_MBR(id *string, path *string) {
 		strE,
 	)
 
-	// Guardar el código DOT en un archivo temporal
-	// tmpFile, err := os.CreateTemp("", "graph-*.dot")
-	// if err != nil {
-	// 	return
-	// }
-	// defer os.Remove(tmpFile.Name())
-
-	// _, err = tmpFile.WriteString(dotCode)
-	// if err != nil {
-	// 	return
-	// }
-
-	// Llamar a Graphviz desde la línea de comandos para renderizar el gráfico
-	// println("path: ", *path)
-	// cmd := exec.Command("dot", "-Tpng", "-o", *path, tmpFile.Name())
-	// err = cmd.Run()
-	// if err != nil {
-	// 	println("Error: no se genero el reporte")
-	// 	return
-	// }
-	// fmt.Println("Reporte MBR generado")
-
 	// Escribir el contenido en el archivo DOT
-	dotFilePath := "./Reports/Rep1/graph.dot" // Ruta donde deseas guardar el archivo DOT
+	dotFilePath := "./Reports/Rep1/mbr_rep.dot" // Ruta donde deseas guardar el archivo DOT
 	dotFile, err := os.Create(dotFilePath)
 	if err != nil {
 		fmt.Println("Error al crear el archivo DOT:", err)
@@ -298,7 +295,8 @@ func REPORT_DISK(id *string, path *string) {
 
 	for _, partition := range TempMBR.Mbr_particion {
 		if partition.Part_correlative == 0 {
-			strP += "|Libre"
+			porcentaje := utilities_test.CalcularPorcentaje(int64(partition.Part_size), int64(TempMBR.Mbr_tamano))
+			strP += fmt.Sprintf(`|Libre\n%d%%`, porcentaje)
 		}
 
 		if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[0].Part_type[:]) {
@@ -323,12 +321,22 @@ func REPORT_DISK(id *string, path *string) {
 				}
 
 				if TempEBR.Part_next != -1 {
-					porcentaje := utilities_test.CalcularPorcentaje(int64(TempEBR.Part_s), int64(TempMBR.Mbr_tamano))
-					strP += fmt.Sprintf(`|EBR|Particion logica %d%%`, porcentaje)
+					if !bytes.Equal(TempEBR.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
+						porcentaje := utilities_test.CalcularPorcentaje(int64(TempEBR.Part_s), int64(TempMBR.Mbr_tamano))
+						strP += fmt.Sprintf(`|EBR|Particion logica %d%%`, porcentaje)
+					} else {
+						porcentaje := utilities_test.CalcularPorcentaje(int64(TempEBR.Part_s), int64(TempMBR.Mbr_tamano))
+						strP += fmt.Sprintf(`|Libre %d%%`, porcentaje)
+					}
 					EPartitionStart = int(TempEBR.Part_next)
 				} else {
-					porcentaje := utilities_test.CalcularPorcentaje(int64(TempEBR.Part_s), int64(TempMBR.Mbr_tamano))
-					strP += fmt.Sprintf(`|EBR|Particion logica %d%%`, porcentaje)
+					if !bytes.Equal(TempEBR.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
+						porcentaje := utilities_test.CalcularPorcentaje(int64(TempEBR.Part_s), int64(TempMBR.Mbr_tamano))
+						strP += fmt.Sprintf(`|EBR|Particion logica %d%%`, porcentaje)
+					} else {
+						porcentaje := utilities_test.CalcularPorcentaje(int64(TempEBR.Part_s), int64(TempMBR.Mbr_tamano))
+						strP += fmt.Sprintf(`|Libre %d%%`, porcentaje)
+					}
 					x = 1
 				}
 			}
@@ -362,7 +370,7 @@ func REPORT_DISK(id *string, path *string) {
 	)
 
 	// Escribir el contenido en el archivo DOT
-	dotFilePath := "./Reports/Rep2/graph.dot" // Ruta donde deseas guardar el archivo DOT
+	dotFilePath := "./Reports/Rep2/disk_rep.dot" // Ruta donde deseas guardar el archivo DOT
 	dotFile, err := os.Create(dotFilePath)
 	if err != nil {
 		fmt.Println("Error al crear el archivo DOT:", err)

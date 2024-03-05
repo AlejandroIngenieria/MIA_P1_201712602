@@ -13,7 +13,7 @@ mkdisk -size=10
 #Crea una partición primaria llamada Particion1 de 300 kb
 #con el peor ajuste en el disco A.dsk
 fdisk -size=300 -driveletter=A -name=Particion1
-#fdisk -size=300 -driveletter=A -name=Particion1
+fdisk -size=300 -driveletter=A -name=Particion1
 
 #Crea una partición extendida dentro del disco B.dsk de 300 kb
 #Tiene el peor ajuste
@@ -22,7 +22,7 @@ fdisk -type=E -driveletter=B -unit=K -name=Particion2 -size=300
 #Crea una partición lógica con el mejor ajuste, llamada Partición 3,
 #de 1 Mb en el disco B
 fdisk -size=100 -type=L -unit=K -fit=bf -driveletter=B -name="Particion3"
-#fdisk -size=100 -type=L -unit=K -fit=bf -driveletter=B -name="Particion5"
+fdisk -size=100 -type=L -unit=K -fit=bf -driveletter=B -name="Particion5"
 
 #Intenta una partición lógica con el mejor ajuste, llamada Partición 3,
 #de 100 Kb en el disco A, deberia dar error porque no existe una particion logica
@@ -31,7 +31,7 @@ fdisk -size=100 -type=L -unit=K -fit=bf -driveletter=B -name="Particion3"
 #Intenta crear una partición extendida dentro del disco B de 200 kb
 #Debería mostrar error ya que ya existe una partición extendida
 #dentro de Disco2
-#fdisk -type=E -driveletter=B -name=Part3 -unit=K -size=200
+fdisk -type=E -driveletter=B -name=Part3 -unit=K -size=200
 
 #Intenta pasarse de las 4 particiones
 fdisk -type=P -driveletter=B -name=PartA -unit=K -size=20
@@ -41,6 +41,9 @@ fdisk -type=P -driveletter=B -name=PartD -unit=K -size=2000
 
 #Elimina de forma rápida una partición llamada PartA
 fdisk -delete=full -name="PartA" -driveletter=B
+
+#Elimina de forma rápida una partición llamada Particion2
+fdisk -delete=full -name="Particion2" -driveletter=B
 
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,9 +56,16 @@ fdisk -add=-500 -size=10 -unit=K -driveletter=B -name=PartD
 #Se debe validar que haya espacio libre después de la partición
 fdisk -add=1 -unit=M -driveletter=B -name="PartC"
 
+#REP
+rep -id=A102 -path=./Reports/Rep1/rep1A.png -name=mbr
+rep -id=A102 -path=./Reports/Rep2/rep2A.png -name=disk
+rep -id=B102 -path=./Reports/Rep1/rep1B.png -name=mbr
+rep -id=B102 -path=./Reports/Rep2/rep2B.png -name=disk
+
+
 #RMDISK
 #Elimina con rmdisk A.dsk
-#rmdisk -driveletter=A
+rmdisk -driveletter=A
 
 #Elimina con rmdisk B.dsk
-#rmdisk -driveletter=B
+rmdisk -driveletter=B

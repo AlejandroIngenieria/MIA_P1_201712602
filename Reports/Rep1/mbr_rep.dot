@@ -13,7 +13,7 @@
 				{MBR: A.dsk|
 					{mbr_tamaño|4096000}
 					|{mbr_fecha_creacion|2024-03-05}
-					|{mbr_disk_signature|1552832260}
+					|{mbr_disk_signature|1433421300}
 								
 		|Particion 1
 		|{part_status|0}
@@ -39,87 +39,31 @@
 		|Particion Logica
 		|{part_status|0}
 		|{part_next|716959}
-		|{part_fit|l}
+		|{part_fit|w}
 		|{part_start|512160}
 		|{part_size|204800}
 		|{part_name|parta}
 		|Particion Logica
 		|{part_status|0}
 		|{part_next|921759}
-		|{part_fit|l}
+		|{part_fit|w}
 		|{part_start|716960}
 		|{part_size|204800}
 		|{part_name|partb}
 		|Particion Logica
 		|{part_status|0}
 		|{part_next|1126559}
-		|{part_fit|l}
+		|{part_fit|w}
 		|{part_start|921760}
 		|{part_size|204800}
 		|{part_name|partc}
 		|Particion Logica
 		|{part_status|0}
-		|{part_next|716959}
-		|{part_fit|l}
-		|{part_start|512160}
-		|{part_size|204800}
-		|{part_name|parta}
-		|Particion Logica
-		|{part_status|0}
-		|{part_next|921759}
-		|{part_fit|l}
-		|{part_start|716960}
-		|{part_size|204800}
-		|{part_name|partb}
-		|Particion Logica
-		|{part_status|0}
-		|{part_next|1126559}
-		|{part_fit|l}
-		|{part_start|921760}
-		|{part_size|204800}
-		|{part_name|partc}
-		|Particion Logica
-		|{part_status|0}
-		|{part_next|716959}
-		|{part_fit|l}
-		|{part_start|512160}
-		|{part_size|204800}
-		|{part_name|parta}
-		|Particion Logica
-		|{part_status|0}
-		|{part_next|921759}
-		|{part_fit|l}
-		|{part_start|716960}
-		|{part_size|204800}
-		|{part_name|partb}
-		|Particion Logica
-		|{part_status|0}
-		|{part_next|1126559}
-		|{part_fit|l}
-		|{part_start|921760}
-		|{part_size|204800}
-		|{part_name|partc}
-		|Particion Logica
-		|{part_status|0}
-		|{part_next|716959}
-		|{part_fit|l}
-		|{part_start|512160}
-		|{part_size|204800}
-		|{part_name|parta}
-		|Particion Logica
-		|{part_status|0}
-		|{part_next|921759}
-		|{part_fit|l}
-		|{part_start|716960}
-		|{part_size|204800}
-		|{part_name|partb}
-		|Particion Logica
-		|{part_status|0}
-		|{part_next|1126559}
-		|{part_fit|l}
-		|{part_start|921760}
-		|{part_size|204800}
-		|{part_name|partc}
+		|{part_next|-1}
+		|{part_fit|w}
+		|{part_start|1126560}
+		|{part_size|102400}
+		|{part_name|partd}
 		|Particion 4
 		|{part_status|0}
 		|{part_type|p}
@@ -136,24 +80,31 @@
 		|Particion Logica
 		|{part_status|0}
 		|{part_next|716959}
-		|{part_fit|l}
+		|{part_fit|w}
 		|{part_start|512160}
 		|{part_size|204800}
 		|{part_name|parta}
 		|Particion Logica
 		|{part_status|0}
 		|{part_next|921759}
-		|{part_fit|l}
+		|{part_fit|w}
 		|{part_start|716960}
 		|{part_size|204800}
 		|{part_name|partb}
 		|Particion Logica
 		|{part_status|0}
 		|{part_next|1126559}
-		|{part_fit|l}
+		|{part_fit|w}
 		|{part_start|921760}
 		|{part_size|204800}
-		|{part_name|partc}}
+		|{part_name|partc}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|-1}
+		|{part_fit|w}
+		|{part_start|1126560}
+		|{part_size|102400}
+		|{part_name|partd}}
 			"];
 
 			title -> mbr [style=invis];

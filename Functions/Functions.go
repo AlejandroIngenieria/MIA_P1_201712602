@@ -17,6 +17,7 @@ import (
 
 var fileCounter int = 0
 var particionesMontadasListado = "Listado de particiones montadas:\n"
+
 //?                          APLICACION DE COMANDOS
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO MKDISK                               */
@@ -309,7 +310,6 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 	// fmt.Println(">>>>>ANTES")
 	// structs_test.PrintMBR(TempMBR)
 
-	var Partition structs_test.Partition
 	// Si la operación es de eliminación y se especifica eliminar completamente
 
 	//?------------------------------------------------------DELETE
@@ -319,18 +319,34 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 		// Buscar la partición por nombre y eliminarla
 		for i := range TempMBR.Mbr_particion {
 			if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
-				TempMBR.Mbr_particion[i] = Partition // Vaciar la partición
+				//Particiones primarias
+				if bytes.Equal(TempMBR.Mbr_particion[i].Part_type[:], compareMBR.Mbr_particion[0].Part_type[:]) {
+					TempMBR.Mbr_particion[i].Part_correlative = 0
+					copy(TempMBR.Mbr_particion[i].Part_fit[:], "")
+					copy(TempMBR.Mbr_particion[i].Part_id[:], "")
+					copy(TempMBR.Mbr_particion[i].Part_name[:], "")
+					copy(TempMBR.Mbr_particion[i].Part_type[:], "")
+					copy(TempMBR.Mbr_particion[i].Part_status[:], "")
+					encontrada = true
+				}
+				//Particiones extendidas
 				if bytes.Equal(TempMBR.Mbr_particion[i].Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) {
 					end := TempMBR.Mbr_particion[i].Part_start + TempMBR.Mbr_particion[i].Part_size
 					utilities_test.ConvertToZeros(filepath, int64(TempMBR.Mbr_particion[i].Part_start), int64(end))
+					TempMBR.Mbr_particion[i].Part_correlative = 0
+					copy(TempMBR.Mbr_particion[i].Part_fit[:], "")
+					copy(TempMBR.Mbr_particion[i].Part_id[:], "")
+					copy(TempMBR.Mbr_particion[i].Part_name[:], "")
+					copy(TempMBR.Mbr_particion[i].Part_type[:], "")
+					copy(TempMBR.Mbr_particion[i].Part_status[:], "")
+					encontrada = true
 				}
-				encontrada = true
 				break
 			}
+
 		}
-
+		//Particiones logicas
 		if !encontrada && EPartition {
-
 			//?EBR verificacion
 			var x = 0
 			for x < 1 {
@@ -449,7 +465,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 					// Escribir un nuevo EBR en el archivo binario
 					var newEBR structs_test.EBR
 					copy(newEBR.Part_mount[:], "0")                                   // Indica si la partición está montada o no
-					copy(newEBR.Part_fit[:], "l")                                     // Tipo de ajuste de la partición
+					copy(newEBR.Part_fit[:], *fit)                                     // Tipo de ajuste de la partición
 					newEBR.Part_start = int32(EPartitionStart) + 1                    // Indica en qué byte del disco inicia la partición
 					newEBR.Part_s = TempEBR.Part_s                                    // Contiene el tamaño total de la partición en bytes
 					newEBR.Part_next = int32(EPartitionStart) + int32(TempEBR.Part_s) // Byte en el que está el próximo EBR (-1 si no hay siguiente)
@@ -465,7 +481,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 					// Escribir un nuevo EBR en el archivo binario
 					var newEBR structs_test.EBR
 					copy(newEBR.Part_mount[:], "0")                // Indica si la partición está montada o no
-					copy(newEBR.Part_fit[:], "l")                  // Tipo de ajuste de la partición
+					copy(newEBR.Part_fit[:], *fit)                  // Tipo de ajuste de la partición
 					newEBR.Part_start = int32(EPartitionStart) + 1 // Indica en qué byte del disco inicia la partición
 					newEBR.Part_s = int32(*size)                   // Contiene el tamaño total de la partición en bytes
 					newEBR.Part_next = -1                          // Byte en el que está el próximo EBR (-1 si no hay siguiente)
@@ -571,8 +587,6 @@ func MountPartition(driveletter *string, name *string) {
 	copy(compareMBR.Mbr_particion[0].Part_type[:], "p")
 	copy(compareMBR.Mbr_particion[1].Part_type[:], "e")
 	copy(compareMBR.Mbr_particion[2].Part_type[:], "l")
-
-	
 
 	for i := 0; i < 4; i++ {
 		if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
