@@ -20,66 +20,115 @@ func Command(input string) {
 	input = strings.ToLower(input)
 	switch {
 	case strings.HasPrefix(input, "mkdisk"):
-		fmt.Println(input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleMKDISKCommand(comando)
+
 	case strings.HasPrefix(input, "rmdisk"):
-		fmt.Println(input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleRMDISKCommand(comando)
+
 	case strings.HasPrefix(input, "fdisk"):
-		fmt.Println(input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleFDISKCommand(comando)
+
 	case strings.HasPrefix(input, "mount"):
-		fmt.Println(input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleMOUNTCommand(comando)
+
 	case strings.HasPrefix(input, "unmount"):
-		fmt.Println(input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleUNMOUNTCommand(comando)
+
 	case strings.HasPrefix(input, "mkfs"):
-		fmt.Println(input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleMKFSCommand(comando)
+
 	case strings.HasPrefix(input, "login"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleLOGINCommand(comando)
+
 	case strings.HasPrefix(input, "logout"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleLOGOUTCommand(comando)
+
 	case strings.HasPrefix(input, "mkgrp"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleMKGRPCommand(comando)
+
 	case strings.HasPrefix(input, "rmgrp"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleRMGRPCommand(comando)
+
 	case strings.HasPrefix(input, "mkusr"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleMKUSRCommand(comando)
+
 	case strings.HasPrefix(input, "rmusr"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleRMUSRCommand(comando)
+
 	case strings.HasPrefix(input, "mkfile"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleMKFILECommand(comando)
+
 	case strings.HasPrefix(input, "cat"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleCATCommand(comando)
+
 	case strings.HasPrefix(input, "remove"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleREMOVECommand(comando)
+
 	case strings.HasPrefix(input, "edit"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleEDITCommand(comando)
+
 	case strings.HasPrefix(input, "rename"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleRENAMECommand(comando)
+
 	case strings.HasPrefix(input, "mkdir"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleMKDIRCommand(comando)
+
 	case strings.HasPrefix(input, "copy"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleCOPYCommand(comando)
+
 	case strings.HasPrefix(input, "move"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleMOVECommand(comando)
+
 	case strings.HasPrefix(input, "find"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleFINDCommand(comando)
+
 	case strings.HasPrefix(input, "chown"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleCHOWNCommand(comando)
+
 	case strings.HasPrefix(input, "chgrp"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleCHGRPCommand(comando)
+
 	case strings.HasPrefix(input, "chmod"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleCHMODCommand(comando)
+
 	case strings.HasPrefix(input, "pause"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handlePAUSECommand()
+
 	case strings.HasPrefix(input, "execute"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleEXECUTECommand(comando)
+
 	case strings.HasPrefix(input, "rep"):
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleREPCommand(comando)
+
 	case strings.HasPrefix(input, "#"):
+		//Ignora las sentencias del lado derecho
 	default:
 		fmt.Println("Comando no reconocido:", input)
 	}
@@ -321,6 +370,9 @@ func handleCHMODCommand(input string) {
 	panic("unimplemented")
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                COMANDO PAUSE                               */
+/* -------------------------------------------------------------------------- */
 func handlePAUSECommand() {
 	fmt.Println("Presione cualquier tecla para continuar...")
 	fmt.Scanln() // Espera a que el usuario presione Enter
@@ -368,6 +420,8 @@ func handleREPCommand(input string) {
 		println("Error: incomplete statements")
 		return
 	}
+	
+	//println("path: "+*path)
 
 	functions_test.GenerateReports(name, path, id, ruta)
 }

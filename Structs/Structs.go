@@ -67,7 +67,6 @@ type EBR struct {
 }
 
 func PrintEBR(data EBR) {
-	
 	fmt.Printf("MOUNT: %s FIT: %s START: %d SIZE: %d NEXT: %d NAME: %s \n",
 		string(data.Part_mount[:]),
 		string(data.Part_fit[:]),

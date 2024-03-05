@@ -21,5 +21,7 @@ fdisk -type=L -driveletter=A -unit=K -name=PartB -size=200
 fdisk -type=L -driveletter=A -unit=K -name=PartC -size=200
 fdisk -type=L -driveletter=A -unit=K -name=PartD -size=100
 
-pause
-rep -id=A102 -path=./Reports/Rep1/mbr.png -name=mbr
+#pause
+rep -id=A102 -path=./Reports/Rep1/rep1.png -name=mbr
+rep -id=A102 -path=./Reports/Rep2/rep2.png -name=disk
+rmdisk -driveletter=a

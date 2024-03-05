@@ -1,0 +1,162 @@
+
+		digraph G {
+ 			fontname="Helvetica,Arial,sans-serif"
+			node [fontname="Helvetica,Arial,sans-serif"]
+			edge [fontname="Helvetica,Arial,sans-serif"]
+			concentrate=True;
+			rankdir=TB;
+			node [shape=record];
+
+			title [label="Reporte MBR" shape=plaintext fontname="Helvetica,Arial,sans-serif"];
+
+  			mbr[label="
+				{MBR: A.dsk|
+					{mbr_tamaño|4096000}
+					|{mbr_fecha_creacion|2024-03-05}
+					|{mbr_disk_signature|1552832260}
+								
+		|Particion 1
+		|{part_status|0}
+		|{part_type|p}
+		|{part_fit|w}
+		|{part_start|159}
+		|{part_size|307200}
+		|{part_name|particion1}
+		|Particion 2
+		|{part_status|0}
+		|{part_type|p}
+		|{part_fit|w}
+		|{part_start|307359}
+		|{part_size|204800}
+		|{part_name|particion2}
+		|Particion 3
+		|{part_status|0}
+		|{part_type|e}
+		|{part_fit|w}
+		|{part_start|512159}
+		|{part_size|2048000}
+		|{part_name|particion3}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|716959}
+		|{part_fit|l}
+		|{part_start|512160}
+		|{part_size|204800}
+		|{part_name|parta}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|921759}
+		|{part_fit|l}
+		|{part_start|716960}
+		|{part_size|204800}
+		|{part_name|partb}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|1126559}
+		|{part_fit|l}
+		|{part_start|921760}
+		|{part_size|204800}
+		|{part_name|partc}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|716959}
+		|{part_fit|l}
+		|{part_start|512160}
+		|{part_size|204800}
+		|{part_name|parta}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|921759}
+		|{part_fit|l}
+		|{part_start|716960}
+		|{part_size|204800}
+		|{part_name|partb}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|1126559}
+		|{part_fit|l}
+		|{part_start|921760}
+		|{part_size|204800}
+		|{part_name|partc}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|716959}
+		|{part_fit|l}
+		|{part_start|512160}
+		|{part_size|204800}
+		|{part_name|parta}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|921759}
+		|{part_fit|l}
+		|{part_start|716960}
+		|{part_size|204800}
+		|{part_name|partb}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|1126559}
+		|{part_fit|l}
+		|{part_start|921760}
+		|{part_size|204800}
+		|{part_name|partc}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|716959}
+		|{part_fit|l}
+		|{part_start|512160}
+		|{part_size|204800}
+		|{part_name|parta}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|921759}
+		|{part_fit|l}
+		|{part_start|716960}
+		|{part_size|204800}
+		|{part_name|partb}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|1126559}
+		|{part_fit|l}
+		|{part_start|921760}
+		|{part_size|204800}
+		|{part_name|partc}
+		|Particion 4
+		|{part_status|0}
+		|{part_type|p}
+		|{part_fit|w}
+		|{part_start|2560159}
+		|{part_size|204800}
+		|{part_name|particion4}
+				}
+			"];
+			title2 [label="Reporte EBR" shape=plaintext fontname="Helvetica,Arial,sans-serif"];
+			
+			ebr[label="
+				{EBR
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|716959}
+		|{part_fit|l}
+		|{part_start|512160}
+		|{part_size|204800}
+		|{part_name|parta}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|921759}
+		|{part_fit|l}
+		|{part_start|716960}
+		|{part_size|204800}
+		|{part_name|partb}
+		|Particion Logica
+		|{part_status|0}
+		|{part_next|1126559}
+		|{part_fit|l}
+		|{part_start|921760}
+		|{part_size|204800}
+		|{part_name|partc}}
+			"];
+
+			title -> mbr [style=invis];
+    		mbr -> title2[style=invis];
+			title2 -> ebr[style=invis];
+		}

@@ -45,7 +45,7 @@ func ProcessMKDISK(input string, size *int, fit *string, unit *string) {
 		case "unit":
 			*unit = flagValue
 		default:
-			fmt.Println("Error: Flag not found")
+			fmt.Println("Error: Flag not found: " + flagName)
 		}
 	}
 
@@ -138,13 +138,23 @@ func createFile(filename string, size int, fit string) error {
 func ProcessRMDISK(input string, driveletter *string) {
 	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
-	match := re.FindStringSubmatch(input)
-	if len(match) != 3 {
-		fmt.Println("Comando rmdisk incorrecto")
-		return
+
+	matches := re.FindAllStringSubmatch(input, -1)
+
+	for _, match := range matches {
+		flagName := match[1]
+		flagValue := match[2]
+
+		// Delete quotes if they are present in the value
+		flagValue = strings.Trim(flagValue, "\"")
+
+		switch flagName {
+		case "driveletter":
+			*driveletter = flagValue
+		default:
+			fmt.Println("Error: Flag not found: " + flagName)
+		}
 	}
-	flagValue := match[2]
-	*driveletter = flagValue
 }
 
 func DeleteBinFile(driveletter *string) {
@@ -175,7 +185,7 @@ func DeleteBinFile(driveletter *string) {
 
 	} else if os.IsNotExist(err) {
 		// El archivo no existe
-		fmt.Printf("El archivo %s no existe.\n", filename)
+		fmt.Printf("El archivo %s.dsk no existe.\n", filename)
 	} else {
 		// Otro error ocurrió
 		fmt.Println("Error al verificar la existencia del archivo:", err)
@@ -221,7 +231,7 @@ func ProcessFDISK(input string, size *int, driveletter *string, name *string, un
 		case "path":
 			*path = flagValue
 		default:
-			fmt.Println("Error: Flag not found")
+			fmt.Println("Error: Flag not found: " + flagName)
 		}
 		if *unit == "" {
 			*unit = "k"
@@ -310,8 +320,42 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 		for i := range TempMBR.Mbr_particion {
 			if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
 				TempMBR.Mbr_particion[i] = Partition // Vaciar la partición
+				if bytes.Equal(TempMBR.Mbr_particion[i].Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) {
+					end := TempMBR.Mbr_particion[i].Part_start + TempMBR.Mbr_particion[i].Part_size
+					utilities_test.ConvertToZeros(filepath, int64(TempMBR.Mbr_particion[i].Part_start), int64(end))
+				}
 				encontrada = true
 				break
+			}
+		}
+
+		if !encontrada && EPartition {
+
+			//?EBR verificacion
+			var x = 0
+			for x < 1 {
+				var TempEBR structs_test.EBR
+				if err := utilities_test.ReadObject(file, &TempEBR, int64(EPartitionStart)); err != nil {
+					return
+				}
+
+				if TempEBR.Part_s != 0 {
+					if bytes.Equal(TempEBR.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
+						copy(TempEBR.Part_mount[:], "0") // Indica si la partición está montada o no
+						copy(TempEBR.Part_fit[:], "")    // Tipo de ajuste de la partición
+						TempEBR.Part_s = 0               // Contiene el tamaño total de la partición en bytes
+						copy(TempEBR.Part_name[:], "")   // Nombre de la partición
+						// Escribir el nuevo EBR en el archivo binario
+						if err := utilities_test.WriteObject(file, TempEBR, int64(EPartitionStart)); err != nil {
+							return
+						}
+						encontrada = true
+						break
+					}
+					EPartitionStart = int(TempEBR.Part_next)
+				} else {
+					x = 1
+				}
 			}
 		}
 
@@ -499,7 +543,7 @@ func ProcessMOUNT(input string, driveletter *string, name *string) {
 		case "name":
 			*name = flagValue
 		default:
-			fmt.Println("Error: Flag not found")
+			fmt.Println("Error: Flag not found: " + flagName)
 		}
 	}
 }
@@ -523,20 +567,28 @@ func MountPartition(driveletter *string, name *string) {
 
 	var compareMBR structs_test.MBR
 	copy(compareMBR.Mbr_particion[0].Part_name[:], *name)
+	copy(compareMBR.Mbr_particion[0].Part_status[:], "1")
 	copy(compareMBR.Mbr_particion[0].Part_type[:], "p")
 	copy(compareMBR.Mbr_particion[1].Part_type[:], "e")
 	copy(compareMBR.Mbr_particion[2].Part_type[:], "l")
 
 	for i := 0; i < 4; i++ {
-
 		if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
-			//println("entro a la igualacion")
+			if bytes.Equal(TempMBR.Mbr_particion[i].Part_status[:], compareMBR.Mbr_particion[0].Part_status[:]) {
+				println("Listando particiones primarias montada")
+				structs_test.PrintPartition(TempMBR.Mbr_particion[i])
+			}
+			if bytes.Equal(TempMBR.Mbr_particion[i].Part_status[:], compareMBR.Mbr_particion[0].Part_status[:]) {
+				println("Error: La particion ya esta montada")
+				return
+			}
 			encontrada = true
 			copy(TempMBR.Mbr_particion[i].Part_status[:], "1")
 			ID := fmt.Sprintf("%s%d%s", *driveletter, TempMBR.Mbr_particion[i].Part_correlative, "02")
 			println(ID)
 			copy(TempMBR.Mbr_particion[i].Part_id[:], ID)
 			break
+
 		}
 	}
 
@@ -563,15 +615,24 @@ func MountPartition(driveletter *string, name *string) {
 				}
 
 				if TempEBR.Part_s != 0 {
+					if bytes.Equal(TempEBR.Part_mount[:], compareMBR.Mbr_particion[0].Part_status[:]) {
+						println("Listando particiones logicas montadas")
+						structs_test.PrintEBR(TempEBR)
+					}
 					if bytes.Equal(TempEBR.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
+						if bytes.Equal(TempEBR.Part_mount[:], compareMBR.Mbr_particion[0].Part_status[:]) {
+							println("Error: La particion ya esta montada")
+							return
+						}
 						copy(TempEBR.Part_mount[:], "1") // Cambia a 1 (montada) es estado de la particion
+						encontrada = true
 
 					}
 					// Escribir el nuevo EBR en el archivo binario
 					if err := utilities_test.WriteObject(file, TempEBR, int64(EPartitionStart)); err != nil {
 						return
 					}
-					structs_test.PrintEBR(TempEBR)
+					//structs_test.PrintEBR(TempEBR)
 					EPartitionStart = int(TempEBR.Part_next)
 				} else {
 					x = 1
@@ -580,12 +641,17 @@ func MountPartition(driveletter *string, name *string) {
 		}
 	}
 
-	// Overwrite the MBR
-	if err := utilities_test.WriteObject(file, TempMBR, 0); err != nil {
-		return
-	}
+	if encontrada {
+		println("Particion montada con exito")
+		// Overwrite the MBR
+		if err := utilities_test.WriteObject(file, TempMBR, 0); err != nil {
+			return
+		}
+		structs_test.PrintMBR(TempMBR)
 
-	structs_test.PrintMBR(TempMBR)
+	} else {
+		println("Error: no se encontro la particion")
+	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -595,13 +661,21 @@ func MountPartition(driveletter *string, name *string) {
 func ProcessUNMOUNT(input string, id *string) {
 	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
-	match := re.FindStringSubmatch(input)
-	if len(match) != 3 {
-		fmt.Println("Comando unmount incorrecto")
-		return
+	matches := re.FindAllStringSubmatch(input, -1)
+
+	for _, match := range matches {
+		flagName := match[1]
+		flagValue := match[2]
+
+		// Delete quotes if they are present in the value
+		flagValue = strings.Trim(flagValue, "\"")
+		switch flagName {
+		case "id":
+			*id = flagValue
+		default:
+			fmt.Println("Error: Flag not found: " + flagName)
+		}
 	}
-	flagValue := match[2]
-	*id = flagValue
 }
 
 func UNMOUNT_Partition(id *string) {
@@ -667,7 +741,7 @@ func ProcessMKFS(input string, id *string, type_ *string, fs *string) {
 		case "fs":
 			*fs = flagValue
 		default:
-			fmt.Println("Error: Flag not found")
+			fmt.Println("Error: Flag not found: " + flagName)
 		}
 	}
 }
@@ -696,8 +770,6 @@ func MKFS(id *string, type_ *string, fs *string) {
 	// Print object
 	structs_test.PrintMBR(TempMBR)
 
-	fmt.Println("-------------")
-
 	var index int = -1
 	// Iterate over the partitions
 	for i := 0; i < 4; i++ {
@@ -724,21 +796,21 @@ func MKFS(id *string, type_ *string, fs *string) {
 	}
 
 	// numerador = (partition_montada.size - sizeof(Structs::Superblock)
-	// denrominador base = (4 + sizeof(Structs::Inodes) + 3 * sizeof(Structs::Fileblock))
+	// denominador base = (4 + sizeof(Structs::Inodes) + 3 * sizeof(Structs::Fileblock))
 	// temp = "2" ? 0 : sizeof(Structs::Journaling)
-	// denrominador = base + temp
+	// denominador = base + temp
 	// n = floor(numerador / denrominador)
 
 	numerador := int32(TempMBR.Mbr_particion[index].Part_size - int32(binary.Size(structs_test.S_block{})))
-	denrominador_base := int32(4 + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.B_files{})))
+	denominador_base := int32(4 + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.B_files{})))
 	var temp int32 = 0
 	if *fs == "2fs" {
 		temp = 0
 	} else {
 		temp = int32(binary.Size(structs_test.Journaling{}))
 	}
-	denrominador := denrominador_base + temp
-	n := int32(numerador / denrominador)
+	denominador := denominador_base + temp
+	n := int32(numerador / denominador)
 
 	fmt.Println("N:", n)
 
@@ -750,14 +822,23 @@ func MKFS(id *string, type_ *string, fs *string) {
 	newSuperblock.S_free_blocks_count = 3 * n
 	newSuperblock.S_free_inodes_count = n
 
-	copy(newSuperblock.S_mtime[:], "28/02/2024")
-	copy(newSuperblock.S_umtime[:], "28/02/2024")
+	// Obtener la marca de tiempo actual
+	currentTime := time.Now()
+
+	// Formatear la marca de tiempo como una cadena
+	timeString := currentTime.Format("2006-01-02 15:04:05")
+
+	// Convertir la cadena a un slice de bytes
+	timeBytes := []byte(timeString)
+
+	copy(newSuperblock.S_mtime[:], timeBytes)
+	copy(newSuperblock.S_umtime[:], timeBytes)
 	newSuperblock.S_mnt_count = 0
 
 	if *fs == "2fs" {
-		create_ext2(n, TempMBR.Mbr_particion[index], newSuperblock, "28/02/2024", file)
+		create_ext2(n, TempMBR.Mbr_particion[index], newSuperblock, timeString, file)
 	} else {
-		create_ext3()
+		create_ext3(n, TempMBR.Mbr_particion[index], newSuperblock, timeString, file)
 	}
 
 	// Close bin file
@@ -920,12 +1001,113 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-
 	//mkfs -type=full -id=A102
 }
 
-func create_ext3() {
+func create_ext3(n int32, partition structs_test.Partition, newSuperblock structs_test.S_block, date string, file *os.File) {
+	fmt.Println("N:", n)
+	fmt.Println("Superblock:", newSuperblock)
+	fmt.Println("Date:", date)
 
+	newSuperblock.S_filesystem_type = 3
+	newSuperblock.S_bm_inode_start = partition.Part_start + int32(binary.Size(structs_test.S_block{}))
+	newSuperblock.S_bm_block_start = newSuperblock.S_bm_inode_start + n
+	newSuperblock.S_inode_start = newSuperblock.S_bm_block_start + 3*n
+	newSuperblock.S_block_start = newSuperblock.S_inode_start + n*int32(binary.Size(structs_test.Inode{}))
+
+	newSuperblock.S_free_inodes_count -= 1
+	newSuperblock.S_free_blocks_count -= 1
+	newSuperblock.S_free_inodes_count -= 1
+	newSuperblock.S_free_blocks_count -= 1
+
+	for i := int32(0); i < n; i++ {
+		err := utilities_test.WriteObject(file, byte(0), int64(newSuperblock.S_bm_inode_start+i))
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	}
+
+	for i := int32(0); i < 3*n; i++ {
+		err := utilities_test.WriteObject(file, byte(0), int64(newSuperblock.S_bm_block_start+i))
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	}
+
+	var newInode structs_test.Inode
+	for i := int32(0); i < 15; i++ {
+		newInode.I_block[i] = -1
+	}
+
+	for i := int32(0); i < n; i++ {
+		err := utilities_test.WriteObject(file, newInode, int64(newSuperblock.S_inode_start+i*int32(binary.Size(structs_test.Inode{}))))
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	}
+
+	var newFileblock structs_test.B_files
+	for i := int32(0); i < 3*n; i++ {
+		err := utilities_test.WriteObject(file, newFileblock, int64(newSuperblock.S_block_start+i*int32(binary.Size(structs_test.B_files{}))))
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	}
+
+	var newJournaling structs_test.Journaling
+	newJournaling.Size = n
+	newJournaling.Ultimo = -1
+
+	for i := 0; i < len(newJournaling.Contenido); i++ {
+		copy(newJournaling.Contenido[i].Operation[:], " ")
+		copy(newJournaling.Contenido[i].Path[:], " ")
+		copy(newJournaling.Contenido[i].Content[:], " ")
+		copy(newJournaling.Contenido[i].Date[:], " ")
+	}
+
+	// write superblock
+	err := utilities_test.WriteObject(file, newSuperblock, int64(partition.Part_start))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	// write bitmap inodes
+	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_inode_start))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_inode_start+1))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	// write bitmap blocks
+	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_block_start))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_block_start+1))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	// write inodes
+	err = utilities_test.WriteObject(file, newInode, int64(newSuperblock.S_inode_start)) //Inode 0
+
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	// write blocks
+	err = utilities_test.WriteObject(file, newJournaling, int64(newSuperblock.S_block_start)) //Journaling
+
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	//mkfs -type=full -id=A102
 }
 
 //?                    ADMINISTRACION DE USUARIOS Y GRUPOS
@@ -951,10 +1133,6 @@ func create_ext3() {
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO RMUSR                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                               COMANDO EXECUTE                              */
 /* -------------------------------------------------------------------------- */
 
 //?               ADMINISTRACION DE CARPETAS, ARCHIVOS Y PERMISOS
@@ -1006,8 +1184,9 @@ func create_ext3() {
 /*                                COMANDO CHMOD                               */
 /* -------------------------------------------------------------------------- */
 
+//?							  EJECUCION DE SCRIPTS
 /* -------------------------------------------------------------------------- */
-/*                                COMANDO PAUSE                               */
+/*                               COMANDO EXECUTE                              */
 /* -------------------------------------------------------------------------- */
 
 func ProcessExecute(input string, path *string) {
