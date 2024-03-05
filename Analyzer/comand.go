@@ -120,7 +120,6 @@ func Command(input string) {
 		handlePAUSECommand()
 
 	case strings.HasPrefix(input, "execute"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
 		handleEXECUTECommand(comando)
 
 	case strings.HasPrefix(input, "rep"):
@@ -420,8 +419,6 @@ func handleREPCommand(input string) {
 		println("Error: incomplete statements")
 		return
 	}
-	
-	//println("path: "+*path)
 
 	functions_test.GenerateReports(name, path, id, ruta)
 }

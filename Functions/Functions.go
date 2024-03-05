@@ -16,7 +16,7 @@ import (
 )
 
 var fileCounter int = 0
-
+var particionesMontadasListado = "Listado de particiones montadas:\n"
 //?                          APLICACION DE COMANDOS
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO MKDISK                               */
@@ -572,21 +572,27 @@ func MountPartition(driveletter *string, name *string) {
 	copy(compareMBR.Mbr_particion[1].Part_type[:], "e")
 	copy(compareMBR.Mbr_particion[2].Part_type[:], "l")
 
+	
+
 	for i := 0; i < 4; i++ {
 		if bytes.Equal(TempMBR.Mbr_particion[i].Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
-			if bytes.Equal(TempMBR.Mbr_particion[i].Part_status[:], compareMBR.Mbr_particion[0].Part_status[:]) {
-				println("Listando particiones primarias montada")
-				structs_test.PrintPartition(TempMBR.Mbr_particion[i])
+
+			if bytes.Equal(TempMBR.Mbr_particion[i].Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) {
+				println("Error: No es necesario montar la particion extendida")
+				return
 			}
+
 			if bytes.Equal(TempMBR.Mbr_particion[i].Part_status[:], compareMBR.Mbr_particion[0].Part_status[:]) {
 				println("Error: La particion ya esta montada")
 				return
 			}
+
 			encontrada = true
 			copy(TempMBR.Mbr_particion[i].Part_status[:], "1")
 			ID := fmt.Sprintf("%s%d%s", *driveletter, TempMBR.Mbr_particion[i].Part_correlative, "02")
-			println(ID)
+			//println(ID)
 			copy(TempMBR.Mbr_particion[i].Part_id[:], ID)
+			particionesMontadasListado += structs_test.GetPartition(TempMBR.Mbr_particion[i]) + "\n"
 			break
 
 		}
@@ -615,10 +621,6 @@ func MountPartition(driveletter *string, name *string) {
 				}
 
 				if TempEBR.Part_s != 0 {
-					if bytes.Equal(TempEBR.Part_mount[:], compareMBR.Mbr_particion[0].Part_status[:]) {
-						println("Listando particiones logicas montadas")
-						structs_test.PrintEBR(TempEBR)
-					}
 					if bytes.Equal(TempEBR.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
 						if bytes.Equal(TempEBR.Part_mount[:], compareMBR.Mbr_particion[0].Part_status[:]) {
 							println("Error: La particion ya esta montada")
@@ -626,11 +628,11 @@ func MountPartition(driveletter *string, name *string) {
 						}
 						copy(TempEBR.Part_mount[:], "1") // Cambia a 1 (montada) es estado de la particion
 						encontrada = true
-
-					}
-					// Escribir el nuevo EBR en el archivo binario
-					if err := utilities_test.WriteObject(file, TempEBR, int64(EPartitionStart)); err != nil {
-						return
+						// Escribir el nuevo EBR en el archivo binario
+						if err := utilities_test.WriteObject(file, TempEBR, int64(EPartitionStart)); err != nil {
+							return
+						}
+						particionesMontadasListado += structs_test.GetEBR(TempEBR) + "\n"
 					}
 					//structs_test.PrintEBR(TempEBR)
 					EPartitionStart = int(TempEBR.Part_next)
@@ -640,18 +642,18 @@ func MountPartition(driveletter *string, name *string) {
 			}
 		}
 	}
-
 	if encontrada {
 		println("Particion montada con exito")
 		// Overwrite the MBR
 		if err := utilities_test.WriteObject(file, TempMBR, 0); err != nil {
 			return
 		}
-		structs_test.PrintMBR(TempMBR)
+		//structs_test.PrintMBR(TempMBR)
 
 	} else {
 		println("Error: no se encontro la particion")
 	}
+	println(particionesMontadasListado)
 }
 
 /* -------------------------------------------------------------------------- */

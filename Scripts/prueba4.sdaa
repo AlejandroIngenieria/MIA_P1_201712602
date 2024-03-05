@@ -1,0 +1,35 @@
+#execute -path=./Scripts/prueba4.sdaa
+
+#MKDISK
+
+#Crea un disco de 4000 Kb
+mkdisk -size=4000 -unit=K
+
+#FDISK
+
+#Crea una partición primaria llamada Particion1 de 300 kb
+#con el peor ajuste en el disco A.dsk
+fdisk -size=300 -driveletter=A -name=Particion1
+fdisk -type=P -driveletter=A -name=Particion2 -unit=K -size=200
+fdisk -type=E -driveletter=A -name=Particion3 -unit=K -size=2000
+fdisk -type=P -driveletter=A -name=Particion4 -unit=K -size=200
+
+
+#Creacion de particiones logicas (EBR)
+fdisk -type=L -driveletter=A -unit=K -name=PartA -size=200
+fdisk -type=L -driveletter=A -unit=K -name=PartB -size=200
+fdisk -type=L -driveletter=A -unit=K -name=PartC -size=200
+fdisk -type=L -driveletter=A -unit=K -name=PartD -size=100
+
+
+#MOUNT 
+#driveletter + Particion Correlative + 02
+#Monta las particiones de A.dsk
+#Canet Ejemplo -> 201712602
+mount -driveletter=A -name=Particion1
+mount -driveletter=A -name=Particion3
+mount -driveletter=A -name=PartA
+mount -driveletter=A -name=PartC
+mount -driveletter=A -name=Particion4
+
+rmdisk -driveletter=a

@@ -14,11 +14,11 @@ type MBR struct {
 }
 
 func PrintMBR(data MBR) {
-	fmt.Printf("CreationDate: %s, fit: %s, size: %d \n", 
-	string(data.Mbr_fecha_creacion[:]), 
-	string(data.Dsk_fit[:]), 
-	data.Mbr_tamano)
-	
+	fmt.Printf("CreationDate: %s, fit: %s, size: %d \n",
+		string(data.Mbr_fecha_creacion[:]),
+		string(data.Dsk_fit[:]),
+		data.Mbr_tamano)
+
 	for i := 0; i < 4; i++ {
 		fmt.Printf("Partition %d, Name: %s, Tipo: %s, Start: %d, Size: %d Status %s Correlativo %d ID %s CORRELATIVE: %d \n",
 			i,
@@ -47,13 +47,24 @@ type Partition struct {
 }
 
 func PrintPartition(data Partition) {
-	fmt.Printf("Name: %s, type: %s, start: %d, size: %d, status: %s, id: %s\n", 
-	string(data.Part_name[:]), 
-	string(data.Part_type[:]), 
-	data.Part_start, 
-	data.Part_size, 
-	string(data.Part_status[:]), 
-	string(data.Part_id[:]))
+	fmt.Printf("Name: %s, type: %s, start: %d, size: %d, status: %s, id: %s\n",
+		string(data.Part_name[:]),
+		string(data.Part_type[:]),
+		data.Part_start,
+		data.Part_size,
+		string(data.Part_status[:]),
+		string(data.Part_id[:]))
+}
+
+func GetPartition(data Partition) string {
+	str := fmt.Sprintf("Name: %s, type: %s, start: %d, size: %d, status: %s, id: %s\n",
+		string(data.Part_name[:]),
+		string(data.Part_type[:]),
+		data.Part_start,
+		data.Part_size,
+		string(data.Part_status[:]),
+		string(data.Part_id[:]))
+	return str
 }
 
 // Extended Boot Record (EBR)
@@ -75,6 +86,18 @@ func PrintEBR(data EBR) {
 		data.Part_next,
 		string(data.Part_name[:]),
 	)
+}
+
+func GetEBR(data EBR) string {
+	str := fmt.Sprintf("MOUNT: %s FIT: %s START: %d SIZE: %d NEXT: %d NAME: %s \n",
+		string(data.Part_mount[:]),
+		string(data.Part_fit[:]),
+		data.Part_start,
+		data.Part_s,
+		data.Part_next,
+		string(data.Part_name[:]),
+	)
+	return str
 }
 
 // ? CARPETAS Y ARCHIVOS (EXT3|EXT2)
