@@ -20,116 +20,116 @@ func Command(input string) {
 	input = strings.ToLower(input)
 	switch {
 	case strings.HasPrefix(input, "mkdisk"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleMKDISKCommand(comando)
 
 	case strings.HasPrefix(input, "rmdisk"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleRMDISKCommand(comando)
 
 	case strings.HasPrefix(input, "fdisk"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleFDISKCommand(comando)
 
 	case strings.HasPrefix(input, "mount"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleMOUNTCommand(comando)
 
 	case strings.HasPrefix(input, "unmount"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleUNMOUNTCommand(comando)
 
 	case strings.HasPrefix(input, "mkfs"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleMKFSCommand(comando)
 
 	case strings.HasPrefix(input, "login"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleLOGINCommand(comando)
 
 	case strings.HasPrefix(input, "logout"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
-		handleLOGOUTCommand(comando)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
+		handleLOGOUTCommand()
 
 	case strings.HasPrefix(input, "mkgrp"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleMKGRPCommand(comando)
 
 	case strings.HasPrefix(input, "rmgrp"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleRMGRPCommand(comando)
 
 	case strings.HasPrefix(input, "mkusr"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleMKUSRCommand(comando)
 
 	case strings.HasPrefix(input, "rmusr"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleRMUSRCommand(comando)
 
 	case strings.HasPrefix(input, "mkfile"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleMKFILECommand(comando)
 
 	case strings.HasPrefix(input, "cat"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleCATCommand(comando)
 
 	case strings.HasPrefix(input, "remove"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleREMOVECommand(comando)
 
 	case strings.HasPrefix(input, "edit"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleEDITCommand(comando)
 
 	case strings.HasPrefix(input, "rename"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleRENAMECommand(comando)
 
 	case strings.HasPrefix(input, "mkdir"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleMKDIRCommand(comando)
 
 	case strings.HasPrefix(input, "copy"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleCOPYCommand(comando)
 
 	case strings.HasPrefix(input, "move"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleMOVECommand(comando)
 
 	case strings.HasPrefix(input, "find"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleFINDCommand(comando)
 
 	case strings.HasPrefix(input, "chown"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleCHOWNCommand(comando)
 
 	case strings.HasPrefix(input, "chgrp"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleCHGRPCommand(comando)
 
 	case strings.HasPrefix(input, "chmod"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleCHMODCommand(comando)
 
 	case strings.HasPrefix(input, "pause"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handlePAUSECommand()
 
 	case strings.HasPrefix(input, "execute"):
 		handleEXECUTECommand(comando)
 
 	case strings.HasPrefix(input, "rep"):
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>"+input)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>" + comando)
 		handleREPCommand(comando)
 
 	case strings.HasPrefix(input, "#"):
 		//Ignora las sentencias del lado derecho
 	default:
-		fmt.Println("Comando no reconocido:", input)
+		fmt.Println("Comando no reconocido:", comando)
 	}
 }
 
@@ -146,8 +146,14 @@ var (
 	id          = flag.String("id", "", "ID")
 	fs          = flag.String("fs", "", "FDISK")
 	ruta        = flag.String("ruta", "", "Ruta")
+	user        = flag.String("user", "", "Usuario")
+	pass        = flag.String("pass", "", "Password")
+	grp         = flag.String("grp", "", "Group")
 )
 
+/* -------------------------------------------------------------------------- */
+/*                           APLICACION DE COMANDOS                           */
+/* -------------------------------------------------------------------------- */
 func handleMKDISKCommand(input string) {
 
 	flag.Parse()
@@ -272,14 +278,18 @@ func handleMOUNTCommand(input string) {
 	functions_test.MountPartition(driveletter, name)
 	*driveletter = ""
 	*name = ""
-
 }
 
 func handleUNMOUNTCommand(input string) {
 	flag.Parse()
 	functions_test.ProcessUNMOUNT(input, id)
 
+	if *id == "" {
+		println("Error: Id es un campo obligatorio")
+	}
+
 	functions_test.UNMOUNT_Partition(id)
+	*id = ""
 }
 
 func handleMKFSCommand(input string) {
@@ -295,32 +305,106 @@ func handleMKFSCommand(input string) {
 	}
 
 	functions_test.MKFS(id, type_, fs)
+	*id = ""
+	*type_ = ""
+	*fs = ""
 }
 
+/* -------------------------------------------------------------------------- */
+/*                         ADMINISTRACION DE USUARIOS                         */
+/* -------------------------------------------------------------------------- */
 func handleLOGINCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessLOGIN(input, user, pass, id)
+
+	if *user == "" || *pass == "" || *id == "" {
+		println("Error: campos incompletos")
+	}
+
+	functions_test.LOGIN(user, pass, id)
+
+	*user = ""
+	*pass = ""
+	*id = ""
 }
 
-func handleLOGOUTCommand(input string) {
-	panic("unimplemented")
+func handleLOGOUTCommand() {
+	functions_test.ProcessLOGOUT()
 }
 
 func handleMKGRPCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessMKGRP(input, name)
+
+	if *name == "" {
+		println("Error: el campo name no puede estar vacio")
+		return
+	}
+
+	functions_test.MKGRP(name)
+	*name = ""
 }
 
 func handleRMGRPCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessMKGRP(input, name)
+
+	if *name == "" {
+		println("Error: el campo name no puede estar vacio")
+		return
+	}
+
+	functions_test.RMGRP(name)
+	*name = ""
 }
 
 func handleMKUSRCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessMKUSR(input, user, pass, grp)
+
+	if len(*user) > 10 {
+		println("Error: user no puede ser mayor a 10 caracteres")
+		return
+	}
+	if len(*pass) > 10 {
+		println("Error: password no puede ser mayor a 10 caracteres")
+		return
+	}
+	if len(*grp) > 10 {
+		println("Error: grupo no puede ser mayor a 10 caracteres")
+		return
+	}
+
+	if *user == "" || *pass == "" || *grp == "" {
+		println("Error: campos incompletos")
+		return
+	}
+
+	functions_test.MKUSR(user, pass, grp)
+
+	*user = ""
+	*pass = ""
+	*grp = ""
+
 }
 
 func handleRMUSRCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessRMUSR(input, user)
+
+	if *user == "" {
+		println("Error: user no puede estar vacio")
+		return
+	}
+
+	functions_test.RMUSR(user)
+
+	*user = ""
 }
 
+/* -------------------------------------------------------------------------- */
+/*                         ADMINISTRACION DE CARPETAS                         */
+/* -------------------------------------------------------------------------- */
 func handleMKFILECommand(input string) {
 	panic("unimplemented")
 }
@@ -370,7 +454,7 @@ func handleCHMODCommand(input string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                COMANDO PAUSE                               */
+/*                            COMANDOS AUXILIARES                             */
 /* -------------------------------------------------------------------------- */
 func handlePAUSECommand() {
 	fmt.Println("Presione cualquier tecla para continuar...")
@@ -411,6 +495,9 @@ func handleEXECUTECommand(input string) {
 	*path = ""
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                  REPORTES                                  */
+/* -------------------------------------------------------------------------- */
 func handleREPCommand(input string) {
 	flag.Parse()
 	functions_test.ProcessREP(input, name, path, id, ruta)

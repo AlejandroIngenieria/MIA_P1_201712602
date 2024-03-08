@@ -180,8 +180,9 @@ func DeleteBinFile(driveletter *string) {
 				fmt.Println("Error al eliminar el archivo:", err)
 				return
 			}
+			fileCounter --
 		} else {
-			fmt.Println("Entrada no válida.")
+			return
 		}
 
 	} else if os.IsNotExist(err) {
@@ -739,7 +740,6 @@ func UNMOUNT_Partition(id *string) {
 /*                                COMANDO MKFS                                */
 /* -------------------------------------------------------------------------- */
 func ProcessMKFS(input string, id *string, type_ *string, fs *string) {
-	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
 	matches := re.FindAllStringSubmatch(input, -1)
 
@@ -771,9 +771,9 @@ func ProcessMKFS(input string, id *string, type_ *string, fs *string) {
 
 func MKFS(id *string, type_ *string, fs *string) {
 
-	fmt.Println("Id:", id)
-	fmt.Println("Type:", type_)
-	fmt.Println("Fs:", fs)
+	fmt.Println("Id:", *id)
+	fmt.Println("Type:", *type_)
+	fmt.Println("Fs:", *fs)
 
 	driveletter := string((*id)[0])
 
@@ -818,64 +818,43 @@ func MKFS(id *string, type_ *string, fs *string) {
 		return
 	}
 
+	numerador := int32(TempMBR.Mbr_particion[index].Part_size - int32(binary.Size(structs_test.Superblock{})))
+	denrominador_base := int32(4 + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.Fileblock{})))
+	var temp int32 = 0
 	if *fs == "2fs" {
-		numerador := int32(TempMBR.Mbr_particion[index].Part_size - int32(binary.Size(structs_test.S_block{})))
-		denominador := int32(4 + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.B_files{})))
-		n := int32(numerador / denominador)
+		temp = 0
+	} else {
+		temp = int32(binary.Size(structs_test.Journaling{}))
+	}
+	denrominador := denrominador_base + temp
+	n := int32(numerador / denrominador)
 
-		fmt.Println("N:", n)
+	fmt.Println("N:", n)
 
-		// var newMRB Structs.MRB
-		var newSuperblock structs_test.S_block
-		newSuperblock.S_inodes_count = 0
-		newSuperblock.S_blocks_count = 0
+	// var newMRB Structs.MRB
+	var newSuperblock structs_test.Superblock
+	newSuperblock.S_inodes_count = 0
+	newSuperblock.S_blocks_count = 0
 
-		newSuperblock.S_free_blocks_count = 3 * n
-		newSuperblock.S_free_inodes_count = n
+	newSuperblock.S_free_blocks_count = 3 * n
+	newSuperblock.S_free_inodes_count = n
 
-		// Obtener la marca de tiempo actual
-		currentTime := time.Now()
+	// Obtener la marca de tiempo actual
+	currentTime := time.Now()
 
-		// Formatear la marca de tiempo como una cadena
-		timeString := currentTime.Format("2006-01-02 15:04:05")
+	// Formatear la marca de tiempo como una cadena
+	timeString := currentTime.Format("2006-01-02 15:04:05")
 
-		// Convertir la cadena a un slice de bytes
-		timeBytes := []byte(timeString)
+	// Convertir la cadena a un slice de bytes
+	timeBytes := []byte(timeString)
 
-		copy(newSuperblock.S_mtime[:], timeBytes)
-		copy(newSuperblock.S_umtime[:], timeBytes)
-		newSuperblock.S_mnt_count = 0
+	copy(newSuperblock.S_mtime[:], timeBytes)
+	copy(newSuperblock.S_umtime[:], timeBytes)
+	newSuperblock.S_mnt_count = 0
+
+	if *fs == "2fs" {
 		create_ext2(n, TempMBR.Mbr_particion[index], newSuperblock, timeString, file)
 	} else {
-		numerador := int32(TempMBR.Mbr_particion[index].Part_size - int32(binary.Size(structs_test.S_block{})))
-		denominador := int32(4 + int32(binary.Size(structs_test.Journaling{})) + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.B_files{})))
-		
-		n := int32(numerador / denominador)
-
-		fmt.Println("N:", n)
-
-		// var newMRB Structs.MRB
-		var newSuperblock structs_test.S_block
-		var newJournaling structs_test.Journaling
-		newSuperblock.S_inodes_count = 0
-		newSuperblock.S_blocks_count = 0
-
-		newSuperblock.S_free_blocks_count = 3 * n
-		newSuperblock.S_free_inodes_count = n
-		newJournaling.Size = n
-
-		// Obtener la marca de tiempo actual
-		currentTime := time.Now()
-
-		// Formatear la marca de tiempo como una cadena
-		timeString := currentTime.Format("2006-01-02 15:04:05")
-
-		// Convertir la cadena a un slice de bytes
-		timeBytes := []byte(timeString)
-
-		copy(newSuperblock.S_mtime[:], timeBytes)
-		copy(newSuperblock.S_umtime[:], timeBytes)
-		newSuperblock.S_mnt_count = 0
 		create_ext3(n, TempMBR.Mbr_particion[index], newSuperblock, timeString, file)
 	}
 
@@ -884,13 +863,13 @@ func MKFS(id *string, type_ *string, fs *string) {
 
 }
 
-func create_ext2(n int32, partition structs_test.Partition, newSuperblock structs_test.S_block, date string, file *os.File) {
+func create_ext2(n int32, partition structs_test.Partition, newSuperblock structs_test.Superblock, date string, file *os.File) {
 	fmt.Println("N:", n)
 	fmt.Println("Superblock:", newSuperblock)
 	fmt.Println("Date:", date)
 
 	newSuperblock.S_filesystem_type = 2
-	newSuperblock.S_bm_inode_start = partition.Part_start + int32(binary.Size(structs_test.S_block{}))
+	newSuperblock.S_bm_inode_start = partition.Part_start + int32(binary.Size(structs_test.Superblock{}))
 	newSuperblock.S_bm_block_start = newSuperblock.S_bm_inode_start + n
 	newSuperblock.S_inode_start = newSuperblock.S_bm_block_start + 3*n
 	newSuperblock.S_block_start = newSuperblock.S_inode_start + n*int32(binary.Size(structs_test.Inode{}))
@@ -926,9 +905,9 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 		}
 	}
 
-	var newFileblock structs_test.B_files
+	var newFileblock structs_test.Fileblock
 	for i := int32(0); i < 3*n; i++ {
-		err := utilities_test.WriteObject(file, newFileblock, int64(newSuperblock.S_block_start+i*int32(binary.Size(structs_test.B_files{}))))
+		err := utilities_test.WriteObject(file, newFileblock, int64(newSuperblock.S_block_start+i*int32(binary.Size(structs_test.Fileblock{}))))
 		if err != nil {
 			fmt.Println("Error: ", err)
 		}
@@ -937,11 +916,11 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	var Inode0 structs_test.Inode //Inode 0
 	Inode0.I_uid = 1
 	Inode0.I_gid = 1
-	Inode0.I_s = 0
+	Inode0.I_size = 0
 	copy(Inode0.I_atime[:], date)
 	copy(Inode0.I_ctime[:], date)
 	copy(Inode0.I_mtime[:], date)
-	copy(Inode0.I_perm[:], "0")
+	copy(Inode0.I_type[:], "1")
 	copy(Inode0.I_perm[:], "664")
 
 	for i := int32(0); i < 15; i++ {
@@ -955,32 +934,32 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	// users.txt | 1
 	//
 
-	var Folderblock0 structs_test.B_files //Bloque 0 -> carpetas
-	Folderblock0.B_content[0].B_inodo = 0
+	var Folderblock0 structs_test.Folderblock //Bloque 0 -> carpetas
 	copy(Folderblock0.B_content[0].B_name[:], ".")
-	Folderblock0.B_content[1].B_inodo = 0
+	Folderblock0.B_content[0].B_inodo = 0
 	copy(Folderblock0.B_content[1].B_name[:], "..")
-	Folderblock0.B_content[2].B_inodo = 1
+	Folderblock0.B_content[1].B_inodo = 0
 	copy(Folderblock0.B_content[2].B_name[:], "users.txt")
+	Folderblock0.B_content[2].B_inodo = 1
 
 	var Inode1 structs_test.Inode //Inode 1
 	Inode1.I_uid = 1
 	Inode1.I_gid = 1
-	Inode1.I_s = int32(binary.Size(structs_test.B_files{}))
+	Inode1.I_size = int32(binary.Size(structs_test.Folderblock{}))
 	copy(Inode1.I_atime[:], date)
 	copy(Inode1.I_ctime[:], date)
 	copy(Inode1.I_mtime[:], date)
-	copy(Inode1.I_perm[:], "0")
+	copy(Inode1.I_type[:], "1")
 	copy(Inode1.I_perm[:], "664")
 
 	for i := int32(0); i < 15; i++ {
 		Inode1.I_block[i] = -1
 	}
 
-	Inode0.I_block[0] = 1
+	Inode1.I_block[0] = 1
 
 	data := "1,G,root\n1,U,root,root,123\n"
-	var Fileblock1 structs_test.B_docs //Bloque 1 -> archivo
+	var Fileblock1 structs_test.Fileblock //Bloque 1 -> archivo
 	copy(Fileblock1.B_content[:], data)
 
 	// Inodo 0 -> Bloque 0 -> Inodo 1 -> Bloque 1
@@ -998,229 +977,47 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-
 	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_inode_start+1))
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-
 	// write bitmap blocks
 	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_block_start))
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-
 	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_block_start+1))
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
+
+	fmt.Println("Inode 0:", int64(newSuperblock.S_inode_start))
+	fmt.Println("Inode 1:", int64(newSuperblock.S_inode_start+int32(binary.Size(structs_test.Inode{}))))
 
 	// write inodes
 	err = utilities_test.WriteObject(file, Inode0, int64(newSuperblock.S_inode_start)) //Inode 0
-
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-
 	err = utilities_test.WriteObject(file, Inode1, int64(newSuperblock.S_inode_start+int32(binary.Size(structs_test.Inode{})))) //Inode 1
-
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
+
 	// write blocks
 	err = utilities_test.WriteObject(file, Folderblock0, int64(newSuperblock.S_block_start)) //Bloque 0
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+	err = utilities_test.WriteObject(file, Fileblock1, int64(newSuperblock.S_block_start+int32(binary.Size(structs_test.Fileblock{})))) //Bloque 1
 
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-
-	err = utilities_test.WriteObject(file, Fileblock1, int64(newSuperblock.S_block_start+int32(binary.Size(structs_test.B_files{})))) //Bloque 1
-
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-	//mkfs -type=full -id=A102
 }
 
-func create_ext3(n int32, partition structs_test.Partition, newSuperblock structs_test.S_block, date string, file *os.File) {
-	fmt.Println("N:", n)
-	fmt.Println("Superblock:", newSuperblock)
-	fmt.Println("Date:", date)
-
-	newSuperblock.S_filesystem_type = 3
-	newSuperblock.S_bm_inode_start = partition.Part_start + int32(binary.Size(structs_test.S_block{}))
-	newSuperblock.S_bm_block_start = newSuperblock.S_bm_inode_start + n
-	newSuperblock.S_inode_start = newSuperblock.S_bm_block_start + 3*n
-	newSuperblock.S_block_start = newSuperblock.S_inode_start + n*int32(binary.Size(structs_test.Inode{}))
-
-	newSuperblock.S_free_inodes_count -= 1
-	newSuperblock.S_free_blocks_count -= 1
-	newSuperblock.S_free_inodes_count -= 1
-	newSuperblock.S_free_blocks_count -= 1
-
-	for i := int32(0); i < n; i++ {
-		err := utilities_test.WriteObject(file, byte(0), int64(newSuperblock.S_bm_inode_start+i))
-		if err != nil {
-			fmt.Println("Error: ", err)
-		}
-	}
-
-	for i := int32(0); i < 3*n; i++ {
-		err := utilities_test.WriteObject(file, byte(0), int64(newSuperblock.S_bm_block_start+i))
-		if err != nil {
-			fmt.Println("Error: ", err)
-		}
-	}
-
-	var newInode structs_test.Inode
-	for i := int32(0); i < 15; i++ {
-		newInode.I_block[i] = -1
-	}
-
-	for i := int32(0); i < n; i++ {
-		err := utilities_test.WriteObject(file, newInode, int64(newSuperblock.S_inode_start+i*int32(binary.Size(structs_test.Inode{}))))
-		if err != nil {
-			fmt.Println("Error: ", err)
-		}
-	}
-
-	var newFileblock structs_test.B_files
-	for i := int32(0); i < 3*n; i++ {
-		err := utilities_test.WriteObject(file, newFileblock, int64(newSuperblock.S_block_start+i*int32(binary.Size(structs_test.B_files{}))))
-		if err != nil {
-			fmt.Println("Error: ", err)
-		}
-	}
-
-	var newJournaling structs_test.Journaling
-	newJournaling.Size = n
-	newJournaling.Ultimo = -1
-
-	for i := 0; i < len(newJournaling.Contenido); i++ {
-		copy(newJournaling.Contenido[i].Operation[:], " ")
-		copy(newJournaling.Contenido[i].Path[:], " ")
-		copy(newJournaling.Contenido[i].Content[:], " ")
-		copy(newJournaling.Contenido[i].Date[:], " ")
-	}
-
-	// write superblock
-	err := utilities_test.WriteObject(file, newSuperblock, int64(partition.Part_start))
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-
-	// write bitmap inodes
-	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_inode_start))
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-
-	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_inode_start+1))
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-
-	// write bitmap blocks
-	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_block_start))
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-
-	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_block_start+1))
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-
-	// write inodes
-	err = utilities_test.WriteObject(file, newInode, int64(newSuperblock.S_inode_start)) //Inode 0
-
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-
-	// write blocks
-	err = utilities_test.WriteObject(file, newJournaling, int64(newSuperblock.S_block_start)) //Journaling
-
-	if err != nil {
-		fmt.Println("Error: ", err)
-	}
-
-	//mkfs -type=full -id=A102
+func create_ext3(n int32, partition structs_test.Partition, newSuperblock structs_test.Superblock, date string, file *os.File) {
 }
-
-//?                    ADMINISTRACION DE USUARIOS Y GRUPOS
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO LOGIN                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                               COMANDO LOGOUT                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO MKGRP                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO RMGRP                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO MKUSR                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO RMUSR                               */
-/* -------------------------------------------------------------------------- */
-
-//?               ADMINISTRACION DE CARPETAS, ARCHIVOS Y PERMISOS
-/* -------------------------------------------------------------------------- */
-/*                               COMANDO MKFILE                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                 COMANDO CAT                                */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                               COMANDO REMOVE                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO EDIT                                */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                               COMANDO RENAME                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO MKDIR                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO COPY                                */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO MOVE                                */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO FIND                                */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO CHOWN                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO CHGRP                               */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO CHMOD                               */
-/* -------------------------------------------------------------------------- */
 
 //?							  EJECUCION DE SCRIPTS
 /* -------------------------------------------------------------------------- */

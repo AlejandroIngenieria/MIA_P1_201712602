@@ -1,0 +1,36 @@
+#execute -path=./Scripts/prueba5.sdaa
+
+#MKDISK
+
+#Crea un disco de 4000 Kb
+
+mkdisk -size=4000 -unit=K
+
+#FDISK
+
+#Crea una partición primaria llamada Particion1 de 300 kb
+#con el peor ajuste en el disco A.dsk
+
+fdisk -size=300 -driveletter=A -name=Particion1
+
+#MOUNT 
+
+#driveletter + Particion Correlative + 02
+#Monta las particiones de A.dsk
+#Canet Ejemplo -> 201712602
+
+mount -driveletter=A -name=Particion1
+
+#MKFS
+
+mkfs -type=full -id=A102 -fs=2fs
+
+login -user=root -pass=123 -id=A102
+
+mkgrp -name=usuarios
+mkusr -user=usu1 -pass=11 -grp=usuarios
+rmusr -user=usu1
+mkgrp -name=usuarios1
+
+
+rmdisk -driveletter=A
