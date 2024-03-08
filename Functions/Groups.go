@@ -14,7 +14,8 @@ var (
 	session      = false
 	usuario      = Global.UserInfo{}
 	groupCounter = 1
-	blockIndex   = int32(0)
+	blockIndex   = 0
+	searchIndex  = 0
 	// userCounter = 1
 	letra = ""
 	ID    = ""
@@ -200,7 +201,9 @@ func ProcessMKGRP(input string, name *string) {
 }
 
 func MKGRP(name *string) {
-	// Abrir el archivo del disco
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
 	filepath := "./Disks/" + letra + ".dsk"
 	file, err := utilities_test.OpenFile(filepath)
 	if err != nil {
@@ -209,14 +212,18 @@ func MKGRP(name *string) {
 	}
 	defer file.Close()
 
-	// Leer el MBR del disco
+	/* -------------------------------------------------------------------------- */
+	/*                              CARGAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
 	var TempMBR structs_test.MBR
 	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
 		fmt.Println("Error reading MBR:", err)
 		return
 	}
 
-	// Encontrar la partición adecuada en el MBR
+	/* -------------------------------------------------------------------------- */
+	/*                       BUSCAMOS LA PARTICION CON EL ID                      */
+	/* -------------------------------------------------------------------------- */
 	index := -1
 	for i := 0; i < 4; i++ {
 		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), ID) {
@@ -229,14 +236,18 @@ func MKGRP(name *string) {
 		return
 	}
 
-	// Leer el superbloque de la partición
+	/* -------------------------------------------------------------------------- */
+	/*                           CARGAMOS EL SUPERBLOQUE                          */
+	/* -------------------------------------------------------------------------- */
 	var tempSuperblock structs_test.Superblock
 	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
 		fmt.Println("Error reading superblock:", err)
 		return
 	}
 
-	// Leer el inode correspondiente al bloque de archivos
+	/* -------------------------------------------------------------------------- */
+	/*                   LEEMOS EL INODO 1 DONDE ESTA USERS.TXT                   */
+	/* -------------------------------------------------------------------------- */
 	indexInode := int32(1)
 	var crrInode structs_test.Inode
 	if err := utilities_test.ReadObject(file, &crrInode, int64(tempSuperblock.S_inode_start+indexInode*int32(binary.Size(structs_test.Inode{})))); err != nil {
@@ -244,18 +255,25 @@ func MKGRP(name *string) {
 		return
 	}
 
-	// Leer el contenido actual del Fileblock
+	fmt.Println("Bitmap de bloques del inodo1")
+	fmt.Println(crrInode.I_block)
+
+	/* -------------------------------------------------------------------------- */
+	/*                             LEEMOS EL FILEBLOCK                            */
+	/* -------------------------------------------------------------------------- */
 	var Fileblock structs_test.Fileblock
-	if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
+	if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(blockIndex))); err != nil {
 		fmt.Println("Error reading Fileblock:", err)
 		return
 	}
-
+	println("ANTES")
 	data := string(Fileblock.B_content[:])
 	// Dividir la cadena en líneas
 	lines := strings.Split(data, "\n")
 
-	//------------------------------------------------------------------ Iterar a través de las líneas
+	/* -------------------------------------------------------------------------- */
+	/*          ITERAMOS EN CADA LINEA PARA QUE NO HAYAN GRUPOS REPETIDOS         */
+	/* -------------------------------------------------------------------------- */
 	for _, line := range lines {
 		// Imprimir cada línea
 		fmt.Println(line)
@@ -268,45 +286,66 @@ func MKGRP(name *string) {
 		}
 	}
 
-	// Convertir B_content a string y añadir el nuevo grupo
+	/* -------------------------------------------------------------------------- */
+	/*                          PARSEAMOS LA INFORMACION                          */
+	/* -------------------------------------------------------------------------- */
 	currentContent := strings.TrimRight(string(Fileblock.B_content[:]), "\x00")
 	groupCounter++
 	nuevoGrupo := fmt.Sprintf("%d,G,%s\n", groupCounter, *name)
 	newContent := currentContent + nuevoGrupo
 
-	// Asegurarse de que el nuevo contenido quepa dentro del Fileblock
+	/* -------------------------------------------------------------------------- */
+	/*                 CREAMOS MAS FILEBLOCKS PARA GUARDAR LA INFO                */
+	/* -------------------------------------------------------------------------- */
 	if len(newContent) > len(Fileblock.B_content) {
-		for i := int32(0); i < 15; i++ {
-			if crrInode.I_block[i] == -1 {
-				crrInode.I_block[i] = 1
-				blockIndex = i
-				break
-			}
+		if blockIndex > int(len(crrInode.I_block)) {
+			fmt.Println("Error: no hay mas bloques disponibles")
+			return
 		}
-		fmt.Println("New content is too large to fit in Fileblock")
-		return
+		blockIndex++
+		fmt.Print("BlockIndex = " + fmt.Sprint(blockIndex))
+		var NEWFileblock structs_test.Fileblock
+		if err := utilities_test.WriteObject(file, &NEWFileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(blockIndex))); err != nil {
+			fmt.Println("Error reading Fileblock:", err)
+			return
+		}
+
+		/* -------------------------------------------------------------------------- */
+		/*                     ACTUALIZAMOS LOS BLOQUES DEL INODO                     */
+		/* -------------------------------------------------------------------------- */
+		crrInode.I_block[blockIndex] = 1
+
+		if err := utilities_test.WriteObject(file, &crrInode, int64(tempSuperblock.S_inode_start+indexInode*int32(binary.Size(structs_test.Inode{})))); err != nil {
+			fmt.Println("Error writing Inode to disk:", err)
+			return
+		}
+
+		MKGRP(name)
+	} else {
+		/* -------------------------------------------------------------------------- */
+		/*                GUARDA LA INFORMACION EN EL FILEBLOCK ACTUAL                */
+		/* -------------------------------------------------------------------------- */
+		copy(Fileblock.B_content[:], newContent)
+
+		if err := utilities_test.WriteObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(blockIndex))); err != nil {
+			fmt.Println("Error writing Fileblock to disk:", err)
+			return
+		}
+
+		println("DESPUES")
+		// Mostrar el contenido actualizado del Fileblock
+		data := string(Fileblock.B_content[:])
+		// Dividir la cadena en líneas
+		lines := strings.Split(data, "\n")
+
+		/* -------------------------------------------------------------------------- */
+		/*          ITERAMOS EN CADA LINEA PARA QUE NO HAYAN GRUPOS REPETIDOS         */
+		/* -------------------------------------------------------------------------- */
+		for _, line := range lines {
+			// Imprimir cada línea
+			fmt.Println(line)
+		}
 	}
-
-	// Copiar el nuevo contenido al Fileblock
-	copy(Fileblock.B_content[:], newContent)
-
-	// Escribir el Fileblock actualizado de nuevo en el disco
-	if err := utilities_test.WriteObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
-		fmt.Println("Error writing Fileblock to disk:", err)
-		return
-	}
-
-	// Leer y mostrar el contenido actualizado del Fileblock desde el disco
-	var updatedFileblock structs_test.Fileblock
-	if err := utilities_test.ReadObject(file, &updatedFileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
-		fmt.Println("Error reading updated Fileblock:", err)
-		return
-	}
-
-	// Mostrar el contenido actualizado del Fileblock
-	updatedContent := strings.TrimRight(string(updatedFileblock.B_content[:]), "\x00")
-	fmt.Println("Updated Fileblock content:")
-	fmt.Println(updatedContent)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -339,7 +378,9 @@ func ProcessRMGRP(input string, name *string) {
 }
 
 func RMGRP(name *string) {
-	// Abrir el archivo del disco
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
 	filepath := "./Disks/" + letra + ".dsk"
 	file, err := utilities_test.OpenFile(filepath)
 	if err != nil {
@@ -355,7 +396,9 @@ func RMGRP(name *string) {
 		return
 	}
 
-	// Encontrar la partición adecuada en el MBR
+	/* -------------------------------------------------------------------------- */
+	/*                               CARGAMOS EL MBR                              */
+	/* -------------------------------------------------------------------------- */
 	index := -1
 	for i := 0; i < 4; i++ {
 		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), ID) {
@@ -368,14 +411,18 @@ func RMGRP(name *string) {
 		return
 	}
 
-	// Leer el superbloque de la partición
+	/* -------------------------------------------------------------------------- */
+	/*                           CARGAMOS EL SUPERBLOQUE                          */
+	/* -------------------------------------------------------------------------- */
 	var tempSuperblock structs_test.Superblock
 	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
 		fmt.Println("Error reading superblock:", err)
 		return
 	}
 
-	// Leer el inode correspondiente al bloque de archivos
+	/* -------------------------------------------------------------------------- */
+	/*                   LEEMOS EN INODO 1 DONDE ESTA USERS.TXT                   */
+	/* -------------------------------------------------------------------------- */
 	indexInode := int32(1)
 	var crrInode structs_test.Inode
 	if err := utilities_test.ReadObject(file, &crrInode, int64(tempSuperblock.S_inode_start+indexInode*int32(binary.Size(structs_test.Inode{})))); err != nil {
@@ -383,9 +430,11 @@ func RMGRP(name *string) {
 		return
 	}
 
-	// Leer el contenido actual del Fileblock
+	/* -------------------------------------------------------------------------- */
+	/*                      LEEMOS EL CONTENIDO DEL FILEBLOCK                     */
+	/* -------------------------------------------------------------------------- */
 	var Fileblock structs_test.Fileblock
-	if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
+	if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(searchIndex))); err != nil {
 		fmt.Println("Error reading Fileblock:", err)
 		return
 	}
@@ -404,8 +453,13 @@ func RMGRP(name *string) {
 
 	// Si el grupo no fue encontrado, mostrar un mensaje y salir
 	if !deleted {
-		fmt.Println("Group not found")
-		return
+		searchIndex++
+		if searchIndex > blockIndex {
+			fmt.Println("Group not found")
+			return
+		}
+		RMGRP(name)
+
 	}
 
 	// Reunir las líneas actualizadas en un nuevo contenido con saltos de línea
@@ -414,23 +468,22 @@ func RMGRP(name *string) {
 	// Copiar el nuevo contenido al Fileblock
 	copy(Fileblock.B_content[:], newContent)
 
-	// Escribir el Fileblock actualizado de nuevo en el disco
-	if err := utilities_test.WriteObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
-		fmt.Println("Error writing Fileblock to disk:", err)
-		return
-	}
-
-	// Leer y mostrar el contenido actualizado del Fileblock desde el disco
-	var updatedFileblock structs_test.Fileblock
-	if err := utilities_test.ReadObject(file, &updatedFileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
-		fmt.Println("Error reading updated Fileblock:", err)
-		return
-	}
-
 	// Mostrar el contenido actualizado del Fileblock
-	updatedContent := strings.TrimRight(string(updatedFileblock.B_content[:]), "\x00")
-	fmt.Println("Updated Fileblock content:")
-	fmt.Println(updatedContent)
+	if deleted {
+		// Escribir el Fileblock actualizado de nuevo en el disco
+		if err := utilities_test.WriteObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(searchIndex))); err != nil {
+			fmt.Println("Error writing Fileblock to disk:", err)
+			return
+		}
+
+		currentContent := strings.TrimRight(string(Fileblock.B_content[:]), "\x00")
+		lines := strings.Split(currentContent, "\n")
+		for i := range lines {
+			println(lines[i])
+		}
+
+		searchIndex = 0
+	}
 }
 
 /* -------------------------------------------------------------------------- */
