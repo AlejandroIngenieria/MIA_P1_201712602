@@ -180,7 +180,7 @@ func DeleteBinFile(driveletter *string) {
 				fmt.Println("Error al eliminar el archivo:", err)
 				return
 			}
-			fileCounter --
+			fileCounter--
 		} else {
 			return
 		}
@@ -819,15 +819,15 @@ func MKFS(id *string, type_ *string, fs *string) {
 	}
 
 	numerador := int32(TempMBR.Mbr_particion[index].Part_size - int32(binary.Size(structs_test.Superblock{})))
-	denrominador_base := int32(4 + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.Fileblock{})))
+	denominador_base := int32(4 + int32(binary.Size(structs_test.Inode{})) + 3*int32(binary.Size(structs_test.Fileblock{})))
 	var temp int32 = 0
 	if *fs == "2fs" {
 		temp = 0
 	} else {
 		temp = int32(binary.Size(structs_test.Journaling{}))
 	}
-	denrominador := denrominador_base + temp
-	n := int32(numerador / denrominador)
+	denominador := denominador_base + temp
+	n := int32(numerador / denominador)
 
 	fmt.Println("N:", n)
 
@@ -1017,7 +1017,172 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 }
 
 func create_ext3(n int32, partition structs_test.Partition, newSuperblock structs_test.Superblock, date string, file *os.File) {
+	fmt.Println("N:", n)
+	fmt.Println("Superblock:", newSuperblock)
+	fmt.Println("Date:", date)
+
+	newSuperblock.S_filesystem_type = 3
+	newSuperblock.S_bm_inode_start = partition.Part_start + int32(binary.Size(structs_test.Superblock{}))
+	newSuperblock.S_bm_block_start = newSuperblock.S_bm_inode_start + n
+	newSuperblock.S_inode_start = newSuperblock.S_bm_block_start + 3*n
+	newSuperblock.S_block_start = newSuperblock.S_inode_start + n*int32(binary.Size(structs_test.Inode{}))
+
+	newSuperblock.S_free_inodes_count -= 1
+	newSuperblock.S_free_blocks_count -= 1
+	newSuperblock.S_free_inodes_count -= 1
+	newSuperblock.S_free_blocks_count -= 1
+
+	var err error // Declarar la variable err una sola vez
+
+	for i := int32(0); i < n; i++ {
+		err = utilities_test.WriteObject(file, byte(0), int64(newSuperblock.S_bm_inode_start+i))
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	}
+
+	for i := int32(0); i < 3*n; i++ {
+		err = utilities_test.WriteObject(file, byte(0), int64(newSuperblock.S_bm_block_start+i))
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	}
+
+	var newInode structs_test.Inode
+	for i := int32(0); i < 15; i++ {
+		newInode.I_block[i] = -1
+	}
+
+	for i := int32(0); i < n; i++ {
+		err = utilities_test.WriteObject(file, newInode, int64(newSuperblock.S_inode_start+i*int32(binary.Size(structs_test.Inode{}))))
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	}
+
+	var newFileblock structs_test.Fileblock
+	for i := int32(0); i < 3*n; i++ {
+		err = utilities_test.WriteObject(file, newFileblock, int64(newSuperblock.S_block_start+i*int32(binary.Size(structs_test.Fileblock{}))))
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	}
+
+	var Inode0 structs_test.Inode //Inode 0
+	Inode0.I_uid = 1
+	Inode0.I_gid = 1
+	Inode0.I_size = 0
+	copy(Inode0.I_atime[:], date)
+	copy(Inode0.I_ctime[:], date)
+	copy(Inode0.I_mtime[:], date)
+	copy(Inode0.I_type[:], "1")
+	copy(Inode0.I_perm[:], "664")
+
+	for i := int32(0); i < 15; i++ {
+		Inode0.I_block[i] = -1
+	}
+
+	Inode0.I_block[0] = 0
+
+	// . | 0
+	// .. | 0
+	// users.txt | 1
+	//
+
+	var Folderblock0 structs_test.Folderblock //Bloque 0 -> carpetas
+	copy(Folderblock0.B_content[0].B_name[:], ".")
+	Folderblock0.B_content[0].B_inodo = 0
+	copy(Folderblock0.B_content[1].B_name[:], "..")
+	Folderblock0.B_content[1].B_inodo = 0
+	copy(Folderblock0.B_content[2].B_name[:], "users.txt")
+	Folderblock0.B_content[2].B_inodo = 1
+
+	var Inode1 structs_test.Inode //Inode 1
+	Inode1.I_uid = 1
+	Inode1.I_gid = 1
+	Inode1.I_size = int32(binary.Size(structs_test.Folderblock{}))
+	copy(Inode1.I_atime[:], date)
+	copy(Inode1.I_ctime[:], date)
+	copy(Inode1.I_mtime[:], date)
+	copy(Inode1.I_type[:], "1")
+	copy(Inode1.I_perm[:], "664")
+
+	for i := int32(0); i < 15; i++ {
+		Inode1.I_block[i] = -1
+	}
+
+	Inode1.I_block[0] = 1
+
+	data := "1,G,root\n1,U,root,root,123\n"
+	var Fileblock1 structs_test.Fileblock //Bloque 1 -> archivo
+	copy(Fileblock1.B_content[:], data)
+
+	// Inodo 0 -> Bloque 0 -> Inodo 1 -> Bloque 1
+	// Crear la carpeta raiz /
+	// Crear el archivo users.txt "1,G,root\n1,U,root,root,123\n"
+
+	// Write Journaling structure
+	var journal structs_test.Journaling
+	journal.Size = 50
+	journal.Ultimo = -1 // Assuming this should be initialized with -1
+
+	// write superblock
+	err = utilities_test.WriteObject(file, newSuperblock, int64(partition.Part_start))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	// Writing journal to disk
+	err = utilities_test.WriteObject(file, journal, int64(newSuperblock.S_block_start+(3*n)*int32(binary.Size(structs_test.Fileblock{}))))
+	if err != nil {
+		fmt.Println("Error writing Journaling to disk:", err)
+		return
+	}
+
+	// write bitmap inodes
+	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_inode_start))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_inode_start+1))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+	// write bitmap blocks
+	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_block_start))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+	err = utilities_test.WriteObject(file, byte(1), int64(newSuperblock.S_bm_block_start+1))
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	fmt.Println("Inode 0:", int64(newSuperblock.S_inode_start))
+	fmt.Println("Inode 1:", int64(newSuperblock.S_inode_start+int32(binary.Size(structs_test.Inode{}))))
+
+	// write inodes
+	err = utilities_test.WriteObject(file, Inode0, int64(newSuperblock.S_inode_start)) //Inode 0
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+	err = utilities_test.WriteObject(file, Inode1, int64(newSuperblock.S_inode_start+int32(binary.Size(structs_test.Inode{})))) //Inode 1
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	// write blocks
+	err = utilities_test.WriteObject(file, Folderblock0, int64(newSuperblock.S_block_start)) //Bloque 0
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+	err = utilities_test.WriteObject(file, Fileblock1, int64(newSuperblock.S_block_start+int32(binary.Size(structs_test.Fileblock{})))) //Bloque 1
+
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
 }
+
 
 //?							  EJECUCION DE SCRIPTS
 /* -------------------------------------------------------------------------- */
