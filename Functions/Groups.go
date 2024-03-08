@@ -534,7 +534,7 @@ func MKUSR(user *string, pass *string, grp *string) {
 		fmt.Println(line)
 		items := strings.Split(line, ",")
 		if len(items) == 3 {
-			fmt.Println("items[2]->"+items[2])
+			fmt.Println("items[2]->" + items[2])
 			if *grp == items[2] {
 				groupFound = true
 				newUserLine = fmt.Sprintf("%s,G,%s,%s,%s\n", items[0], *grp, *user, *pass)
@@ -700,4 +700,13 @@ func RMUSR(user *string) {
 	}
 
 	fmt.Println("User", *user, "removed")
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                COMANDO CHGRP                               */
+/* -------------------------------------------------------------------------- */
+func ProcessCHGRP(input string, user *string, grp *string) {
+}
+
+func CHGRP(user *string, grp *string) {
 }

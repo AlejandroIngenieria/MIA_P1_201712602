@@ -149,6 +149,11 @@ var (
 	user        = flag.String("user", "", "Usuario")
 	pass        = flag.String("pass", "", "Password")
 	grp         = flag.String("grp", "", "Group")
+	r           = flag.Bool("r", false, "Rewrite")
+	cont        = flag.String("cont", "", "Cont")
+	fileN       = flag.String("fileN", "", "fileN")
+	destino     = flag.String("destino", "", "Destino")
+	ugo         = flag.String("ugo", "", "UGO")
 )
 
 /* -------------------------------------------------------------------------- */
@@ -385,7 +390,6 @@ func handleMKUSRCommand(input string) {
 	*user = ""
 	*pass = ""
 	*grp = ""
-
 }
 
 func handleRMUSRCommand(input string) {
@@ -402,55 +406,67 @@ func handleRMUSRCommand(input string) {
 	*user = ""
 }
 
+func handleCHGRPCommand(input string) {
+	flag.Parse()
+	functions_test.ProcessCHGRP(input, user, grp)
+}
+
 /* -------------------------------------------------------------------------- */
 /*                         ADMINISTRACION DE CARPETAS                         */
 /* -------------------------------------------------------------------------- */
 func handleMKFILECommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessMKFILE(input, path, r, size, cont)
 }
 
 func handleCATCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessCAT(input, fileN)
 }
 
 func handleREMOVECommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessREMOVE(input, path)
 }
 
 func handleEDITCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessEDIT(input, path, cont)
 }
 
 func handleRENAMECommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessRENAME(input, path, name)
 }
 
 func handleMKDIRCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessMKDIR(input, path, r)
 }
 
 func handleCOPYCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessCOPY(input, path, destino)
 }
 
 func handleMOVECommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessMOVE(input, path, destino)
 }
 
 func handleFINDCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessFIND(input, path, destino)
 }
 
 func handleCHOWNCommand(input string) {
-	panic("unimplemented")
-}
-
-func handleCHGRPCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessCHOWN(input, path, user, r)
 }
 
 func handleCHMODCommand(input string) {
-	panic("unimplemented")
+	flag.Parse()
+	functions_test.ProcessCHMOD(input, path, ugo, r)
 }
 
 /* -------------------------------------------------------------------------- */

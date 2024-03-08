@@ -4,83 +4,98 @@ package functions_test
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO MKFILE                               */
 /* -------------------------------------------------------------------------- */
-func ProcessMKFILE()  {
-	
+func ProcessMKFILE(input string, path *string, r *bool, size *int, cont *string) {
+}
+
+func MKFILE(path *string, r *string) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                 COMANDO CAT                                */
 /* -------------------------------------------------------------------------- */
-func ProcessCAT()  {
-	
+func ProcessCAT(input string, fileN *string) {
+}
+
+func CAT(fileN *string) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO REMOVE                               */
 /* -------------------------------------------------------------------------- */
-func ProcessREMOVE()  {
-	
+func ProcessREMOVE(input string, path *string) {
+}
+
+func REMOVE(path *string) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO EDIT                                */
 /* -------------------------------------------------------------------------- */
-func ProcessEDIT()  {
-	
+func ProcessEDIT(input string, path *string, cont *string) {
+}
+
+func EDIT(path *string, cont *string) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO RENAME                               */
 /* -------------------------------------------------------------------------- */
-func ProcessRENAME()  {
-	
+func ProcessRENAME(input string, path *string, name *string) {
+}
+
+func RENAME(path *string, name *string) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO MKDIR                               */
 /* -------------------------------------------------------------------------- */
-func ProcessMKDIR()  {
-	
+func ProcessMKDIR(input string, path *string, r *bool) {
+}
+
+func MKDIR(path *string, r *bool) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO COPY                                */
 /* -------------------------------------------------------------------------- */
-func ProcessCOPY()  {
-	
+func ProcessCOPY(input string, path *string, destino *string) {
+}
+
+func COPY(path *string, destino *string) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO MOVE                                */
 /* -------------------------------------------------------------------------- */
-func ProcessMOVE()  {
-	
+func ProcessMOVE(input string, path *string, destino *string) {
+}
+
+func MOVE(path *string, destino *string) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO FIND                                */
 /* -------------------------------------------------------------------------- */
-func ProcessFIND()  {
-	
+func ProcessFIND(input string, path *string, destino *string) {
+}
+
+func FIND(path *string, destino *string) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO CHOWN                               */
 /* -------------------------------------------------------------------------- */
-func ProcessCHOWN()  {
-	
+func ProcessCHOWN(input string, path *string, user *string, r *bool) {
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                COMANDO CHGRP                               */
-/* -------------------------------------------------------------------------- */
-func ProcessCHGRP()  {
-	
+func CHOWN(path *string, user *string, r *bool) {
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO CHMOD                               */
 /* -------------------------------------------------------------------------- */
-func ProcessCHMOD()  {
-	
+func ProcessCHMOD(input string, path *string, ugo *string, r *bool) {
+}
+
+func CHMOD(path *string, ugo *string, r *bool) {
 }
