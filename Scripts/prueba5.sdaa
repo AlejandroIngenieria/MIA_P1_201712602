@@ -46,4 +46,10 @@ rmgrp -name=usuarios3
 rmgrp -name=usuarios1
 rmgrp -name=usuarios8
 
+mkgrp -name=usuarios9
+mkusr -user=juanito -pass=2020 -grp=usuarios1
+mkusr -user=juanita -pass=2020 -grp=usuarios7
+
+
+
 rmdisk -driveletter=A
