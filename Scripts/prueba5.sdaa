@@ -52,4 +52,8 @@ mkusr -user=juanita -pass=2020 -grp=usuarios7
 
 rmusr -user=juanita
 
+logout
+
+login -user=juanito -pass=2020 -id=A102
+
 rmdisk -driveletter=A

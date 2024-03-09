@@ -51,112 +51,111 @@ func ProcessLOGIN(input string, user *string, pass *string, id *string) {
 }
 
 func LOGIN(user *string, pass *string, id *string) {
-	fmt.Println("User:", *user)
-	fmt.Println("Pass:", *pass)
-	fmt.Println("Id:", *id)
 
 	letra = string((*id)[0])
 	ID = *id
 
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
 	filepath := "./Disks/" + letra + ".dsk"
 	file, err := utilities_test.OpenFile(filepath)
 	if err != nil {
+		fmt.Println("Error opening disk file:", err)
 		return
 	}
+	defer file.Close()
 
+	/* -------------------------------------------------------------------------- */
+	/*                              CARGAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
 	var TempMBR structs_test.MBR
-	// Read object from bin file
 	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
+		fmt.Println("Error reading MBR:", err)
 		return
 	}
 
-	var index int = -1
-	// Iterate over the partitions
+	/* -------------------------------------------------------------------------- */
+	/*                       BUSCAMOS LA PARTICION CON EL ID                      */
+	/* -------------------------------------------------------------------------- */
+	index := -1
 	for i := 0; i < 4; i++ {
-		if TempMBR.Mbr_particion[i].Part_size != 0 {
-			if strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), *id) {
-				fmt.Println("Partition found")
-				if strings.Contains(string(TempMBR.Mbr_particion[i].Part_status[:]), "1") {
-					fmt.Println("Partition is mounted")
-					index = i
-				} else {
-					fmt.Println("Partition is not mounted")
-					return
-				}
-				break
-			}
+		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), ID) {
+			index = i
+			break
 		}
 	}
-
-	if index != -1 {
-		structs_test.PrintPartition(TempMBR.Mbr_particion[index])
-	} else {
+	if index == -1 {
 		fmt.Println("Partition not found")
 		return
 	}
 
-	// INICIA LA LLAMADA AL SUPERBLOQUE DE LA PARTICION
-
+	/* -------------------------------------------------------------------------- */
+	/*                           CARGAMOS EL SUPERBLOQUE                          */
+	/* -------------------------------------------------------------------------- */
 	var tempSuperblock structs_test.Superblock
-	// Read object from bin file
 	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
+		fmt.Println("Error reading superblock:", err)
 		return
 	}
 
-	// initSearch /users.txt -> regresa no Inodo
-	// initSearch -> 1
-
+	/* -------------------------------------------------------------------------- */
+	/*                   LEEMOS EL INODO 1 DONDE ESTA USERS.TXT                   */
+	/* -------------------------------------------------------------------------- */
 	indexInode := int32(1)
-
 	var crrInode structs_test.Inode
-	// Read object from bin file
 	if err := utilities_test.ReadObject(file, &crrInode, int64(tempSuperblock.S_inode_start+indexInode*int32(binary.Size(structs_test.Inode{})))); err != nil {
+		fmt.Println("Error reading inode:", err)
 		return
 	}
 
-	// getInodeFileData -> Iterate the I_Block n concat the data
+	// fmt.Println("Bitmap de bloques del inodo1")
+	// fmt.Println(crrInode.I_block)
 
+	/* -------------------------------------------------------------------------- */
+	/*                             LEEMOS EL FILEBLOCK                            */
+	/* -------------------------------------------------------------------------- */
 	var Fileblock structs_test.Fileblock
-	// Read object from bin file
-	if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
+	if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(searchIndex))); err != nil {
+		fmt.Println("Error reading Fileblock:", err)
 		return
 	}
-
-	fmt.Println("Fileblock------------")
+	//fmt.Println("Fileblock " + fmt.Sprint(searchIndex))
 	data := string(Fileblock.B_content[:])
 	// Dividir la cadena en líneas
 	lines := strings.Split(data, "\n")
 
-	// Iterar a través de las líneas
+	userFound := false
 	for _, line := range lines {
 		// Imprimir cada línea
-		fmt.Println(line)
+		// fmt.Println(line)
 		items := strings.Split(line, ",")
 		if len(items) > 3 {
-			usuario.Nombre = items[len(items)-2]
-			usuario.ID = items[0]
-			//Global.PrintUser(usuario)
-			if usuario.Nombre == *user {
+			//fmt.Println("items[2]->" + items[2])
+			if *user == items[len(items)-2] {
+				userFound = true
+				usuario.Nombre = items[len(items)-2]
+				usuario.ID = items[0]
 				session = true
 				break
 			}
 		}
 	}
 
-	Global.PrintUser(usuario)
-
-	if session {
-		fmt.Println("SESION INICIADA " + usuario.Nombre)
+	if !userFound {
+		searchIndex++
+		if searchIndex <= blockIndex {
+			LOGIN(user, pass, id)
+		} else {
+			fmt.Println("Error: no se encontro al usuario")
+			searchIndex = 0
+			return
+		}
 	} else {
-		println("Error: no se logro iniciar sesion")
-		usuario.ID = ""
-		usuario.Nombre = ""
+		Global.PrintUser(usuario)
+		searchIndex = 0
+		return
 	}
-	// Print object
-	fmt.Println("Inode", crrInode.I_block)
-
-	// Close bin file
-	defer file.Close()
 }
 
 /* -------------------------------------------------------------------------- */
@@ -166,6 +165,7 @@ func ProcessLOGOUT() {
 	if session {
 		println("Se ha cerrado la sesion")
 		session = false
+		searchIndex = 0
 		return
 	}
 	println("Error: no hay una sesion activa")
@@ -964,5 +964,3 @@ func BuscarGrupo(user *string, pass *string, grp *string) string {
 	}
 	return ""
 }
-
-
