@@ -698,7 +698,6 @@ func ProcessRMUSR(input string, user *string) {
 }
 
 func RMUSR(user *string) {
-	// Abrir el archivo del disco
 	filepath := "./Disks/" + letra + ".dsk"
 	file, err := utilities_test.OpenFile(filepath)
 	if err != nil {
@@ -707,14 +706,12 @@ func RMUSR(user *string) {
 	}
 	defer file.Close()
 
-	// Leer el MBR del disco
 	var TempMBR structs_test.MBR
 	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
 		fmt.Println("Error reading MBR:", err)
 		return
 	}
 
-	// Encontrar la partición adecuada en el MBR
 	index := -1
 	for i := 0; i < 4; i++ {
 		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), ID) {
@@ -727,14 +724,12 @@ func RMUSR(user *string) {
 		return
 	}
 
-	// Leer el superbloque de la partición
 	var tempSuperblock structs_test.Superblock
 	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
 		fmt.Println("Error reading superblock:", err)
 		return
 	}
 
-	// Leer el inode correspondiente al bloque de archivos
 	indexInode := int32(1)
 	var crrInode structs_test.Inode
 	if err := utilities_test.ReadObject(file, &crrInode, int64(tempSuperblock.S_inode_start+indexInode*int32(binary.Size(structs_test.Inode{})))); err != nil {
@@ -742,56 +737,37 @@ func RMUSR(user *string) {
 		return
 	}
 
-	// Leer el contenido actual del Fileblock
 	var Fileblock structs_test.Fileblock
-	if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
+	if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(searchIndex))); err != nil {
 		fmt.Println("Error reading Fileblock:", err)
 		return
 	}
 
-	// Convertir B_content a string
-	currentContent := strings.TrimRight(string(Fileblock.B_content[:]), "\x00")
+	data := string(Fileblock.B_content[:])
+	lines := strings.Split(data, "\n")
 
-	// Buscar el usuario especificado en el Fileblock
-	userFound := false
-	var newFileblockContent string
-	for _, line := range strings.Split(currentContent, "\n") {
-		if strings.Contains(line, *user) {
-			userFound = true
-			// Cambiar el número de inicio de la línea por 0
-			lineItems := strings.Split(line, ",")
-			if len(lineItems) > 0 {
-				lineItems[0] = "0"
+	for _, line := range lines {
+		items := strings.Split(line, ",")
+		if len(items) > 3 {
+			if *user == items[len(items)-2] {
+				items[0] = "0" // Setear el ID a 0
+				newLine := strings.Join(items, ",")
+				copy(Fileblock.B_content[:], []byte(newLine))
+				if err := utilities_test.WriteObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(searchIndex))); err != nil {
+					fmt.Println("Error writing Fileblock to disk:", err)
+					return
+				}
+				return
 			}
-			newLine := strings.Join(lineItems, ",") + "\n"
-			newFileblockContent += newLine
-		} else {
-			newFileblockContent += line + "\n"
 		}
 	}
 
-	// Si el usuario no fue encontrado, mostrar un mensaje de error y salir
-	if !userFound {
-		fmt.Println("User", *user, "not found")
-		return
+	searchIndex++
+	if searchIndex <= blockIndex {
+		RMUSR(user)
+	} else {
+		fmt.Println("User not found")
 	}
-
-	// Asegurarse de que el nuevo contenido quepa dentro del Fileblock
-	if len(newFileblockContent) > len(Fileblock.B_content) {
-		fmt.Println("New content is too large to fit in Fileblock")
-		return
-	}
-
-	// Copiar el nuevo contenido al Fileblock
-	copy(Fileblock.B_content[:], newFileblockContent)
-
-	// Escribir el Fileblock actualizado en el disco
-	if err := utilities_test.WriteObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{})))); err != nil {
-		fmt.Println("Error writing Fileblock to disk:", err)
-		return
-	}
-
-	fmt.Println("User", *user, "removed")
 }
 
 /* -------------------------------------------------------------------------- */
@@ -888,7 +864,6 @@ func ImprimirBloques() {
 	} else {
 		searchIndex = 0
 	}
-
 }
 
 func BuscarGrupo(user *string, pass *string, grp *string) string {
@@ -989,3 +964,5 @@ func BuscarGrupo(user *string, pass *string, grp *string) string {
 	}
 	return ""
 }
+
+

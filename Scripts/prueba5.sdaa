@@ -50,6 +50,6 @@ mkgrp -name=usuarios9
 mkusr -user=juanito -pass=2020 -grp=usuarios1
 mkusr -user=juanita -pass=2020 -grp=usuarios7
 
-
+rmusr -user=juanita
 
 rmdisk -driveletter=A
