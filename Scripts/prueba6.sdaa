@@ -1,17 +1,17 @@
-#execute -path=./Scripts/prueba5.sdaa
+#execute -path=./Scripts/prueba6.sdaa
 
 #MKDISK
 
-#Crea un disco de 4000 Kb
+#Crea un disco de 30 Mb
 
-mkdisk -size=4000 -unit=K
+mkdisk -size=30
 
 #FDISK
 
-#Crea una partición primaria llamada Particion1 de 300 kb
+#Crea una partición primaria llamada Particion1 de 10 Mb
 #con el peor ajuste en el disco A.dsk
 
-fdisk -size=300 -driveletter=A -name=Particion1
+fdisk -size=10 -driveletter=A -name=Particion1 -unit=M
 
 #MOUNT 
 
@@ -21,9 +21,9 @@ fdisk -size=300 -driveletter=A -name=Particion1
 
 mount -driveletter=A -name=Particion1
 
-#MKFS EXT2
+#MKFS EXT3
 
-mkfs -type=full -id=A102 -fs=2fs
+mkfs -type=full -id=A102 -fs=3fs
 
 login -user=root -pass=123 -id=A102
 

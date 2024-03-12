@@ -1,0 +1,36 @@
+
+		digraph G {
+ 			fontname="Helvetica,Arial,sans-serif"
+			node [fontname="Helvetica,Arial,sans-serif"]
+			edge [fontname="Helvetica,Arial,sans-serif"]
+			concentrate=True;
+			rankdir=TB;
+			node [shape=record];
+
+			title [label="Reporte SUPERBLOCK" shape=plaintext fontname="Helvetica,Arial,sans-serif"];
+
+  			sb[label="
+				{Superblock|
+					{S_filesystem_type|2}
+					|{S_inodes_count|2}
+					|{S_blocks_count|1}
+					|{S_free_blocks_count|2848}
+					|{S_free_inodes_count|948}
+					|{S_mtime|2024-03-12 12:19:}
+					|{S_umtime|2024-03-12 12:19:}
+					|{S_mnt_count|1}
+					|{S_magic|61267}
+					|{S_inode_size|127}
+					|{S_block_size|64}
+					|{S_fist_ino|0}
+					|{S_first_blo|1}
+					|{S_bm_inode_start|253}
+					|{S_bm_block_start|1203}
+					|{S_inode_start|4053}
+					|{S_block_start|124703}
+				}
+			"];
+			
+
+			title -> sb [style=invis];
+		}

@@ -70,7 +70,7 @@ func GenerateReports(name *string, path *string, id *string, ruta *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                 REPORTE MBR                                */
+/*                               1 REPORTE MBR                                */
 /* -------------------------------------------------------------------------- */
 func REPORT_MBR(id *string, path *string) {
 	letra := string((*id)[0])
@@ -256,7 +256,7 @@ func REPORT_MBR(id *string, path *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                REPORTE DISK                                */
+/*                              2 REPORTE DISK                                */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_DISK(id *string, path *string) {
@@ -399,7 +399,7 @@ func REPORT_DISK(id *string, path *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                REPORTE INODE                               */
+/*                              3 REPORTE INODE                               */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_INODE(id *string, path *string) {
@@ -407,7 +407,7 @@ func REPORT_INODE(id *string, path *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                REPORTE BLOCK                               */
+/*                              4 REPORTE BLOCK                               */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_BLOCK(id *string, path *string) {
@@ -415,7 +415,7 @@ func REPORT_BLOCK(id *string, path *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              REPORTE BM_INODE                              */
+/*                            5 REPORTE BM_INODE                              */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_BM_INODE(id *string, path *string) {
@@ -423,7 +423,7 @@ func REPORT_BM_INODE(id *string, path *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                               REPORTE BM_BLOC                              */
+/*                             6 REPORTE BM_BLOC                              */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_BM_BLOCK(id *string, path *string) {
@@ -431,7 +431,7 @@ func REPORT_BM_BLOCK(id *string, path *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                REPORTE TREE                                */
+/*                              7 REPORTE TREE                                */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_TREE() {
@@ -439,15 +439,143 @@ func REPORT_TREE() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                 REPORTE SB                                 */
+/*                               8 REPORTE SB                                 */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_SB(id *string, path *string) {
+	letra := string((*id)[0])
+	letra = strings.ToUpper(letra)
 
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+	filepath := "./Disks/" + letra + ".dsk"
+	file, err := os.Open(filepath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	/* -------------------------------------------------------------------------- */
+	/*                              CARGAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+	var TempMBR structs_test.MBR
+	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
+		fmt.Println("Error reading MBR:", err)
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                       BUSCAMOS LA PARTICION CON EL ID                      */
+	/* -------------------------------------------------------------------------- */
+	index := -1
+	for i := 0; i < 4; i++ {
+		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), ID) {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		fmt.Println("Partition not found")
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                           CARGAMOS EL SUPERBLOQUE                          */
+	/* -------------------------------------------------------------------------- */
+	var tempSuperblock structs_test.Superblock
+	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
+		fmt.Println("Error reading superblock:", err)
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                      GENERAMOS EL REPORTE EN GRAPHVIZ                      */
+	/* -------------------------------------------------------------------------- */
+
+	dotCode := fmt.Sprintf(`
+		digraph G {
+ 			fontname="Helvetica,Arial,sans-serif"
+			node [fontname="Helvetica,Arial,sans-serif"]
+			edge [fontname="Helvetica,Arial,sans-serif"]
+			concentrate=True;
+			rankdir=TB;
+			node [shape=record];
+
+			title [label="Reporte SUPERBLOCK" shape=plaintext fontname="Helvetica,Arial,sans-serif"];
+
+  			sb[label="
+				{Superblock|
+					{S_filesystem_type|%d}
+					|{S_inodes_count|%d}
+					|{S_blocks_count|%d}
+					|{S_free_blocks_count|%d}
+					|{S_free_inodes_count|%d}
+					|{S_mtime|%s}
+					|{S_umtime|%s}
+					|{S_mnt_count|%d}
+					|{S_magic|%d}
+					|{S_inode_size|%d}
+					|{S_block_size|%d}
+					|{S_fist_ino|%d}
+					|{S_first_blo|%d}
+					|{S_bm_inode_start|%d}
+					|{S_bm_block_start|%d}
+					|{S_inode_start|%d}
+					|{S_block_start|%d}
+				}
+			"];
+			
+
+			title -> sb [style=invis];
+		}`,
+		int(tempSuperblock.S_filesystem_type),
+		int(tempSuperblock.S_inodes_count),
+		int(tempSuperblock.S_blocks_count),
+		int(tempSuperblock.S_free_blocks_count),
+		int(tempSuperblock.S_free_inodes_count),
+		tempSuperblock.S_mtime[:],
+		tempSuperblock.S_umtime[:],
+		int(tempSuperblock.S_mnt_count),
+		int(tempSuperblock.S_magic),
+		int(tempSuperblock.S_inode_size),
+		int(tempSuperblock.S_block_size),
+		int(tempSuperblock.S_fist_ino),
+		int(tempSuperblock.S_first_blo),
+		int(tempSuperblock.S_bm_inode_start),
+		int(tempSuperblock.S_bm_block_start),
+		int(tempSuperblock.S_inode_start),
+		int(tempSuperblock.S_block_start),
+	)
+
+	// Escribir el contenido en el archivo DOT
+	dotFilePath := "./Reports/Rep8/sb_rep.dot" // Ruta donde deseas guardar el archivo DOT
+	dotFile, err := os.Create(dotFilePath)
+	if err != nil {
+		fmt.Println("Error al crear el archivo DOT:", err)
+		return
+	}
+	defer dotFile.Close()
+
+	_, err = dotFile.WriteString(dotCode)
+	if err != nil {
+		fmt.Println("Error al escribir en el archivo DOT:", err)
+		return
+	}
+
+	// Llamar a Graphviz para generar el gráfico
+	pngFilePath := *path // Ruta donde deseas guardar el archivo PNG
+	cmd := exec.Command("dot", "-Tpng", "-o", pngFilePath, dotFilePath)
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println("Error al generar el gráfico:", err)
+		return
+	}
+
+	fmt.Println("Reporte MBR, EBR generado en", pngFilePath)
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                REPORTE FILE                                */
+/*                              9 REPORTE FILE                                */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_FILE(id *string, path *string, ruta *string) {
@@ -455,7 +583,7 @@ func REPORT_FILE(id *string, path *string, ruta *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                 REPORTE LS                                 */
+/*                              10 REPORTE LS                                 */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_LS(id *string, path *string, ruta *string) {
@@ -463,7 +591,7 @@ func REPORT_LS(id *string, path *string, ruta *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                             REPORTE JOURNALING                             */
+/*                          11 REPORTE JOURNALING                             */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_JOURNALING() {

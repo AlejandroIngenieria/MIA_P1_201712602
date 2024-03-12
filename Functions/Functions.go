@@ -873,6 +873,10 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	newSuperblock.S_bm_block_start = newSuperblock.S_bm_inode_start + n
 	newSuperblock.S_inode_start = newSuperblock.S_bm_block_start + 3*n
 	newSuperblock.S_block_start = newSuperblock.S_inode_start + n*int32(binary.Size(structs_test.Inode{}))
+	newSuperblock.S_magic = 0xEF53
+	newSuperblock.S_mnt_count = 1
+	newSuperblock.S_inode_size = int32(binary.Size(structs_test.Inode{}))
+	newSuperblock.S_block_size = int32(binary.Size(structs_test.Folderblock{}))
 
 	newSuperblock.S_free_inodes_count -= 1
 	newSuperblock.S_free_blocks_count -= 1
@@ -961,6 +965,12 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	data := "1,G,root\n1,U,root,root,123\n"
 	var Fileblock1 structs_test.Fileblock //Bloque 1 -> archivo
 	copy(Fileblock1.B_content[:], data)
+
+	newSuperblock.S_inodes_count = int32(2)
+	newSuperblock.S_blocks_count = int32(1)
+	newSuperblock.S_fist_ino = int32(0)
+	newSuperblock.S_first_blo = int32(1)
+
 
 	// Inodo 0 -> Bloque 0 -> Inodo 1 -> Bloque 1
 	// Crear la carpeta raiz /

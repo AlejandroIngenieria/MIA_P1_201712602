@@ -151,9 +151,9 @@ var (
 	grp         = flag.String("grp", "", "Group")
 	r           = flag.Bool("r", false, "Rewrite")
 	cont        = flag.String("cont", "", "Cont")
-	fileN       = flag.String("fileN", "", "fileN")
 	destino     = flag.String("destino", "", "Destino")
 	ugo         = flag.String("ugo", "", "UGO")
+	file        = flag.String("file", "", "File to process")
 )
 
 /* -------------------------------------------------------------------------- */
@@ -414,6 +414,23 @@ func handleCHGRPCommand(input string) {
 /* -------------------------------------------------------------------------- */
 /*                         ADMINISTRACION DE CARPETAS                         */
 /* -------------------------------------------------------------------------- */
+func handleMKDIRCommand(input string) {
+	flag.Parse()
+	functions_test.ProcessMKDIR(input, path, r)
+
+	if *path == "" {
+		println("Error: path no puede estar vacio")
+		return
+	}
+
+	fmt.Println("Path: " + *path)
+	fmt.Print("r: ")
+	fmt.Println(*r)
+
+	*path = ""
+	*r = false
+}
+
 func handleMKFILECommand(input string) {
 	flag.Parse()
 	functions_test.ProcessMKFILE(input, path, r, size, cont)
@@ -421,7 +438,7 @@ func handleMKFILECommand(input string) {
 
 func handleCATCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessCAT(input, fileN)
+	functions_test.ProcessCAT(input, file)
 }
 
 func handleREMOVECommand(input string) {
@@ -437,11 +454,6 @@ func handleEDITCommand(input string) {
 func handleRENAMECommand(input string) {
 	flag.Parse()
 	functions_test.ProcessRENAME(input, path, name)
-}
-
-func handleMKDIRCommand(input string) {
-	flag.Parse()
-	functions_test.ProcessMKDIR(input, path, r)
 }
 
 func handleCOPYCommand(input string) {
