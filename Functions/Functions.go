@@ -3,6 +3,7 @@ package functions_test
 import (
 	"P1/Structs"
 	"P1/Utilities"
+	"bufio"
 	"bytes"
 	"encoding/binary"
 	"fmt"
@@ -16,13 +17,13 @@ import (
 )
 
 var fileCounter int = 0
-var particionesMontadasListado = "Listado de particiones montadas:\n"
-
+var particionesMontadasListado = "--------------------MOUNT: LISTADO DE PARTICIONES MONTADAS------------------\n"
+var letraD string
 //?                          APLICACION DE COMANDOS
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO MKDISK                               */
 /* -------------------------------------------------------------------------- */
-func ProcessMKDISK(input string, size *int, fit *string, unit *string) {
+func ProcessMKDISK(input string, size *int, fit *string, unit *string, flagN *bool) {
 	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
 
@@ -47,6 +48,7 @@ func ProcessMKDISK(input string, size *int, fit *string, unit *string) {
 			*unit = flagValue
 		default:
 			fmt.Println("Error: Flag not found: " + flagName)
+			*flagN = true
 		}
 	}
 
@@ -67,7 +69,7 @@ func CreateBinFile(size *int, fit *string, unit *string) {
 	} else {
 		*size = *size * 1024 * 1024
 	}
-
+	letraD = string(letters[fileCounter])
 	if err := createFile(fmt.Sprintf("./Disks/%c.dsk", letters[fileCounter]), *size, *fit); err != nil {
 		fmt.Printf("Error al crear archivo de %d %s: %e", *size, *unit, err)
 		return
@@ -87,17 +89,29 @@ func createFile(filename string, size int, fit string) error {
 	// Open bin file
 	file, err := utilities_test.OpenFile(filename)
 	if err != nil {
-		return nil
+		return err
+	}
+	defer file.Close()
+
+	// Create buffered writer
+	writer := bufio.NewWriter(file)
+
+	// Write 0 binary data to the file using buffer
+	zeroBytes := make([]byte, 1024) // 1024 bytes buffer
+	for i := 0; i < size; i += len(zeroBytes) {
+		remaining := size - i
+		if remaining < len(zeroBytes) {
+			zeroBytes = make([]byte, remaining)
+		}
+		_, err := writer.Write(zeroBytes)
+		if err != nil {
+			return err
+		}
 	}
 
-	// Write 0 binary data to the file
-
-	// create array of byte(0)
-	for i := 0; i < size; i++ {
-		err := utilities_test.WriteObject(file, byte(0), int64(i))
-		if err != nil {
-			fmt.Println("Error: ", err)
-		}
+	// Flush buffer to ensure all data is written
+	if err := writer.Flush(); err != nil {
+		return err
 	}
 
 	// Obtener la hora actual
@@ -113,22 +127,18 @@ func createFile(filename string, size int, fit string) error {
 
 	// Write object in bin file
 	if err := utilities_test.WriteObject(file, TempMBR, 0); err != nil {
-		return nil
+		return err
 	}
 
-	var mbr structs_test.MBR
 	// Read object from bin file
+	var mbr structs_test.MBR
 	if err := utilities_test.ReadObject(file, &mbr, 0); err != nil {
-		return nil
+		return err
 	}
 
-	// Print object
-	// structs_test.PrintMBR(TempMBR)
-
-	// Close bin file
-	defer file.Close()
-
-	defer file.Close()
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Printf("               MKDISK: DISCO %s CREADO CORRECTAMENTE                      \n", letraD)
+	fmt.Println("--------------------------------------------------------------------------")
 
 	return nil
 }
@@ -136,7 +146,7 @@ func createFile(filename string, size int, fit string) error {
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO RMDISK                               */
 /* -------------------------------------------------------------------------- */
-func ProcessRMDISK(input string, driveletter *string) {
+func ProcessRMDISK(input string, driveletter *string, flagN *bool) {
 	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
 
@@ -154,6 +164,7 @@ func ProcessRMDISK(input string, driveletter *string) {
 			*driveletter = flagValue
 		default:
 			fmt.Println("Error: Flag not found: " + flagName)
+			*flagN = true
 		}
 	}
 }
@@ -180,8 +191,14 @@ func DeleteBinFile(driveletter *string) {
 				fmt.Println("Error al eliminar el archivo:", err)
 				return
 			}
+			fmt.Println("--------------------------------------------------------------------------")
+			fmt.Printf("                RMDISK: DISCO %s ELIMINADO CORRECTAMENTE                  \n", strings.ToUpper(*driveletter))
+			fmt.Println("--------------------------------------------------------------------------")
 			fileCounter--
 		} else {
+			fmt.Println("--------------------------------------------------------------------------")
+			fmt.Printf("                   RMDISK: NO DE ELIMINO EL DISCO %s                      \n", strings.ToUpper(*driveletter))
+			fmt.Println("--------------------------------------------------------------------------")
 			return
 		}
 
@@ -197,7 +214,7 @@ func DeleteBinFile(driveletter *string) {
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO FDISK                               */
 /* -------------------------------------------------------------------------- */
-func ProcessFDISK(input string, size *int, driveletter *string, name *string, unit *string, type_ *string, fit *string, delete *string, add *int, path *string) {
+func ProcessFDISK(input string, size *int, driveletter *string, name *string, unit *string, type_ *string, fit *string, delete *string, add *int, path *string, flagN *bool) {
 	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
 	matches := re.FindAllStringSubmatch(input, -1)
@@ -234,6 +251,7 @@ func ProcessFDISK(input string, size *int, driveletter *string, name *string, un
 			*path = flagValue
 		default:
 			fmt.Println("Error: Flag not found: " + flagName)
+			*flagN = true
 		}
 		if *unit == "" {
 			*unit = "k"
@@ -313,7 +331,9 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 
 	// Si la operación es de eliminación y se especifica eliminar completamente
 
-	//?------------------------------------------------------DELETE
+	/* -------------------------------------------------------------------------- */
+	/*                                   DELETE                                   */
+	/* -------------------------------------------------------------------------- */
 
 	if *delete == "full" {
 		encontrada := false
@@ -358,6 +378,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 
 				if TempEBR.Part_s != 0 {
 					if bytes.Equal(TempEBR.Part_name[:], compareMBR.Mbr_particion[0].Part_name[:]) {
+
 						copy(TempEBR.Part_mount[:], "0") // Indica si la partición está montada o no
 						copy(TempEBR.Part_fit[:], "")    // Tipo de ajuste de la partición
 						TempEBR.Part_s = 0               // Contiene el tamaño total de la partición en bytes
@@ -377,13 +398,18 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 		}
 
 		if encontrada {
-			fmt.Printf("Particion: %s eliminada\n", *name)
+			fmt.Println("--------------------------------------------------------------------------")
+			fmt.Printf("                       FDISK: PARTICION %s ELIMINADA                      \n", *name)
+			fmt.Println("--------------------------------------------------------------------------")
 		} else {
-			println("Error: no se encontro la particion")
-			println("Error: no se logro eliminar")
+			fmt.Println("--------------------------------------------------------------------------")
+			fmt.Printf("                    FDISK: NO SE ENCONTRO LA PARTICION %s                 \n", *name)
+			fmt.Println("--------------------------------------------------------------------------")
 		}
 
-		//?-------------------------------------------------------ADD
+		/* -------------------------------------------------------------------------- */
+		/*                                     ADD                                    */
+		/* -------------------------------------------------------------------------- */
 
 	} else if *add != 0 {
 		//println("ADD", *add)
@@ -404,14 +430,19 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 				}
 				TempMBR.Mbr_particion[i].Part_size += int32(*add)
 				if TempMBR.Mbr_particion[i].Part_size > TempMBR.Mbr_tamano {
-					println("Supera el tamaño del disco")
+					println("Error: El tamaño supera el tamaño del disco")
 					return
 				}
+				fmt.Println("--------------------------------------------------------------------------")
+				fmt.Printf("                    FDISK: ESPACIO EN %s MODIFICADO                       \n", *name)
+				fmt.Println("--------------------------------------------------------------------------")
 				break
 			}
 		}
 
-		//?-----------------------------------------------------CREATE
+		/* -------------------------------------------------------------------------- */
+		/*                                   CREATE                                   */
+		/* -------------------------------------------------------------------------- */
 
 	} else {
 		var count = 0
@@ -449,6 +480,9 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 				copy(TempMBR.Mbr_particion[i].Part_status[:], "0")
 				copy(TempMBR.Mbr_particion[i].Part_type[:], *type_)
 				TempMBR.Mbr_particion[i].Part_correlative = int32(count + 1)
+				fmt.Println("--------------------------------------------------------------------------")
+				fmt.Printf("                       FDISK: PARTICION %s CREADA                         ", strings.ToUpper(*type_))
+				fmt.Println("--------------------------------------------------------------------------")
 				break
 			}
 		}
@@ -501,6 +535,9 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 					x = 1
 				}
 			}
+			fmt.Println("--------------------------------------------------------------------------")
+			fmt.Printf("                        FDISK: PARTICION %s CREADA                        ", strings.ToUpper(*type_))
+			fmt.Println("--------------------------------------------------------------------------")
 			return
 		}
 
@@ -543,7 +580,7 @@ func CRUD_Partitions(size *int, driveletter *string, name *string, unit *string,
 /*                                COMANDO MOUNT                               */
 /* -------------------------------------------------------------------------- */
 
-func ProcessMOUNT(input string, driveletter *string, name *string) {
+func ProcessMOUNT(input string, driveletter *string, name *string, flagN *bool) {
 	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
 	matches := re.FindAllStringSubmatch(input, -1)
@@ -561,6 +598,7 @@ func ProcessMOUNT(input string, driveletter *string, name *string) {
 			*name = flagValue
 		default:
 			fmt.Println("Error: Flag not found: " + flagName)
+			*flagN = true
 		}
 	}
 }
@@ -658,7 +696,9 @@ func MountPartition(driveletter *string, name *string) {
 		}
 	}
 	if encontrada {
-		println("Particion montada con exito")
+		fmt.Println("--------------------------------------------------------------------------")
+		fmt.Printf("                        MOUNT: PARTICION %s MONTADA                       \n", *name)
+		fmt.Println("--------------------------------------------------------------------------")
 		// Overwrite the MBR
 		if err := utilities_test.WriteObject(file, TempMBR, 0); err != nil {
 			return
@@ -668,6 +708,7 @@ func MountPartition(driveletter *string, name *string) {
 	} else {
 		println("Error: no se encontro la particion")
 	}
+	particionesMontadasListado += "--------------------------------------------------------------------------\n"
 	println(particionesMontadasListado)
 }
 
@@ -675,7 +716,7 @@ func MountPartition(driveletter *string, name *string) {
 /*                               COMANDO UNMOUNT                              */
 /* -------------------------------------------------------------------------- */
 
-func ProcessUNMOUNT(input string, id *string) {
+func ProcessUNMOUNT(input string, id *string, flagN *bool) {
 	input = strings.ToLower(input) //quitamos el problema de mayusculas/minisculas
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
 	matches := re.FindAllStringSubmatch(input, -1)
@@ -691,6 +732,7 @@ func ProcessUNMOUNT(input string, id *string) {
 			*id = flagValue
 		default:
 			fmt.Println("Error: Flag not found: " + flagName)
+			*flagN = true
 		}
 	}
 }
@@ -701,7 +743,7 @@ func UNMOUNT_Partition(id *string) {
 
 	correlativo, err := strconv.ParseInt(string((*id)[len(*id)-3]), 10, 32)
 	if err != nil {
-		fmt.Println("Error al convertir la cadena a int32:", err)
+		fmt.Println("Error: no se logro convertir la cadena a int32:", err)
 		return
 	}
 	filepath := "./Disks/" + letra + ".dsk"
@@ -732,14 +774,16 @@ func UNMOUNT_Partition(id *string) {
 	if err := utilities_test.WriteObject(file, TempMBR, 0); err != nil {
 		return
 	}
-
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Printf("          UNMOUNT: SE DESMONTO LA PARTICION CON EL ID %s                  \n", strings.ToUpper(*id))
+	fmt.Println("--------------------------------------------------------------------------")
 	structs_test.PrintMBR(TempMBR)
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                COMANDO MKFS                                */
 /* -------------------------------------------------------------------------- */
-func ProcessMKFS(input string, id *string, type_ *string, fs *string) {
+func ProcessMKFS(input string, id *string, type_ *string, fs *string, flagN *bool) {
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
 	matches := re.FindAllStringSubmatch(input, -1)
 
@@ -758,6 +802,7 @@ func ProcessMKFS(input string, id *string, type_ *string, fs *string) {
 			*fs = flagValue
 		default:
 			fmt.Println("Error: Flag not found: " + flagName)
+			*flagN = true
 		}
 
 		if *type_ == "" {
@@ -798,12 +843,12 @@ func MKFS(id *string, type_ *string, fs *string) {
 	for i := 0; i < 4; i++ {
 		if TempMBR.Mbr_particion[i].Part_size != 0 {
 			if strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), *id) {
-				fmt.Println("Partition found")
+				fmt.Println("Particion encontrada")
 				if strings.Contains(string(TempMBR.Mbr_particion[i].Part_status[:]), "1") {
-					fmt.Println("Partition is mounted")
+					fmt.Println("Particion montada")
 					index = i
 				} else {
-					fmt.Println("Partition is not mounted")
+					fmt.Println("Error: La particion no esta montada")
 					return
 				}
 				break
@@ -814,7 +859,7 @@ func MKFS(id *string, type_ *string, fs *string) {
 	if index != -1 {
 		structs_test.PrintPartition(TempMBR.Mbr_particion[index])
 	} else {
-		fmt.Println("Partition not found")
+		fmt.Println("Error: No se encontro la particion")
 		return
 	}
 
@@ -918,9 +963,9 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	}
 
 	var Inode0 structs_test.Inode //Inode 0
-	Inode0.I_uid = 1
-	Inode0.I_gid = 1
-	Inode0.I_size = 0
+	Inode0.I_uid = 0
+	Inode0.I_gid = 0
+	Inode0.I_size = int32(binary.Size(structs_test.Inode{}))
 	copy(Inode0.I_atime[:], date)
 	copy(Inode0.I_ctime[:], date)
 	copy(Inode0.I_mtime[:], date)
@@ -931,7 +976,7 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 		Inode0.I_block[i] = -1
 	}
 
-	Inode0.I_block[0] = 0
+	Inode0.I_block[0] = 1
 
 	// . | 0
 	// .. | 0
@@ -948,8 +993,8 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 
 	var Inode1 structs_test.Inode //Inode 1
 	Inode1.I_uid = 1
-	Inode1.I_gid = 1
-	Inode1.I_size = int32(binary.Size(structs_test.Folderblock{}))
+	Inode1.I_gid = 0
+	Inode1.I_size = int32(binary.Size(structs_test.Inode{}))
 	copy(Inode1.I_atime[:], date)
 	copy(Inode1.I_ctime[:], date)
 	copy(Inode1.I_mtime[:], date)
@@ -970,7 +1015,6 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	newSuperblock.S_blocks_count = int32(1)
 	newSuperblock.S_fist_ino = int32(0)
 	newSuperblock.S_first_blo = int32(1)
-
 
 	// Inodo 0 -> Bloque 0 -> Inodo 1 -> Bloque 1
 	// Crear la carpeta raiz /
@@ -1024,6 +1068,10 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                         MKFS: FORMATO EXT2 APLICADO                      ")
+	fmt.Println("--------------------------------------------------------------------------")
 }
 
 func create_ext3(n int32, partition structs_test.Partition, newSuperblock structs_test.Superblock, date string, file *os.File) {
@@ -1036,6 +1084,10 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 	newSuperblock.S_bm_block_start = newSuperblock.S_bm_inode_start + n
 	newSuperblock.S_inode_start = newSuperblock.S_bm_block_start + 3*n
 	newSuperblock.S_block_start = newSuperblock.S_inode_start + n*int32(binary.Size(structs_test.Inode{}))
+	newSuperblock.S_magic = 0xEF53
+	newSuperblock.S_mnt_count = 1
+	newSuperblock.S_inode_size = int32(binary.Size(structs_test.Inode{}))
+	newSuperblock.S_block_size = int32(binary.Size(structs_test.Folderblock{}))
 
 	newSuperblock.S_free_inodes_count -= 1
 	newSuperblock.S_free_blocks_count -= 1
@@ -1079,8 +1131,8 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 	}
 
 	var Inode0 structs_test.Inode //Inode 0
-	Inode0.I_uid = 1
-	Inode0.I_gid = 1
+	Inode0.I_uid = 0
+	Inode0.I_gid = 0
 	Inode0.I_size = 0
 	copy(Inode0.I_atime[:], date)
 	copy(Inode0.I_ctime[:], date)
@@ -1092,7 +1144,7 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 		Inode0.I_block[i] = -1
 	}
 
-	Inode0.I_block[0] = 0
+	Inode0.I_block[0] = 1
 
 	// . | 0
 	// .. | 0
@@ -1109,7 +1161,7 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 
 	var Inode1 structs_test.Inode //Inode 1
 	Inode1.I_uid = 1
-	Inode1.I_gid = 1
+	Inode1.I_gid = 0
 	Inode1.I_size = int32(binary.Size(structs_test.Folderblock{}))
 	copy(Inode1.I_atime[:], date)
 	copy(Inode1.I_ctime[:], date)
@@ -1135,6 +1187,11 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 	var journal structs_test.Journaling
 	journal.Size = 50
 	journal.Ultimo = -1 // Assuming this should be initialized with -1
+
+	newSuperblock.S_inodes_count = int32(2)
+	newSuperblock.S_blocks_count = int32(1)
+	newSuperblock.S_fist_ino = int32(0)
+	newSuperblock.S_first_blo = int32(1)
 
 	// write superblock
 	err = utilities_test.WriteObject(file, newSuperblock, int64(partition.Part_start))
@@ -1191,19 +1248,34 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-}
 
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                         MKFS: FORMATO EXT3 APLICADO                      ")
+	fmt.Println("--------------------------------------------------------------------------")
+}
 
 //?							  EJECUCION DE SCRIPTS
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO EXECUTE                              */
 /* -------------------------------------------------------------------------- */
 
-func ProcessExecute(input string, path *string) {
+func ProcessExecute(input string, path *string, flagN *bool) {
 	re := regexp.MustCompile(`-(\w+)=("[^"]+"|\S+)`)
-	match := re.FindStringSubmatch(input)
-	if len(match) > 1 {
-		*path = match[2]
+	matches := re.FindAllStringSubmatch(input, -1)
+
+	for _, match := range matches {
+		flagName := match[1]
+		flagValue := match[2]
+
+		// Delete quotes if they are present in the value
+		flagValue = strings.Trim(flagValue, "\"")
+		switch flagName {
+		case "path":
+			*path = flagValue
+		default:
+			fmt.Println("Error: Flag not found: " + flagName)
+			*flagN = true
+		}
 	}
 }
 

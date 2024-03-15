@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"unicode"
 )
 
 /* -------------------------------------------------------------------------- */
@@ -96,4 +97,28 @@ func ConvertToZeros(filename string, start int64, end int64) error {
 
 func CalcularPorcentaje(tamanoParticion int64, tamanoDisco int64) int64 {
 	return (int64(tamanoParticion)*100 / int64(tamanoDisco))
+}
+
+func LimpiarCerosBinarios(bytes []byte) []byte {
+	// Crear un slice para almacenar los bytes sin ceros
+	resultado := []byte{}
+
+	// Recorrer el slice de bytes
+	for _, b := range bytes {
+		// Si el byte no es cero, agregarlo al resultado
+		if b != 0 {
+			resultado = append(resultado, b)
+		}
+	}
+
+	return resultado
+}
+
+func EsNumero(caracter string) bool {
+    runeValue := []rune(caracter)
+    if len(runeValue) != 1 {
+        // No es un solo caracter
+        return false
+    }
+    return unicode.IsDigit(runeValue[0])
 }

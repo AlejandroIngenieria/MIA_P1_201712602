@@ -102,49 +102,57 @@ func GetEBR(data EBR) string {
 
 // ? CARPETAS Y ARCHIVOS (EXT3|EXT2)
 type Superblock struct {
-	S_filesystem_type int32
-	S_inodes_count int32
-	S_blocks_count int32
+	S_filesystem_type   int32
+	S_inodes_count      int32
+	S_blocks_count      int32
 	S_free_blocks_count int32
 	S_free_inodes_count int32
-	S_mtime [17]byte
-	S_umtime [17]byte
-	S_mnt_count int32
-	S_magic int32
-	S_inode_size int32
-	S_block_size int32
-	S_fist_ino int32
-	S_first_blo int32
-	S_bm_inode_start int32
-	S_bm_block_start int32
-	S_inode_start int32
-	S_block_start int32
+	S_mtime             [17]byte
+	S_umtime            [17]byte
+	S_mnt_count         int32
+	S_magic             int32
+	S_inode_size        int32
+	S_block_size        int32
+	S_fist_ino          int32
+	S_first_blo         int32
+	S_bm_inode_start    int32
+	S_bm_block_start    int32
+	S_inode_start       int32
+	S_block_start       int32
 }
 
-//  =============================================================
-
 type Inode struct {
-	I_uid int32
-	I_gid int32
-	I_size int32
+	I_uid   int32
+	I_gid   int32
+	I_size  int32
 	I_atime [17]byte
 	I_ctime [17]byte
 	I_mtime [17]byte
 	I_block [15]int32
-	I_type [1]byte
-	I_perm [3]byte
+	I_type  [1]byte
+	I_perm  [3]byte
 }
 
-//  =============================================================
+func PrintInode(data Inode) {
+	fmt.Printf("UID: %d \nGID: %d \nSIZE: %d \nACTUAL DATE: %s \nCREATION TIME: %s \nMODIFY TIME: %s \nBLOCKS:%d \nTYPE:%s \nPERM:%s \n",
+		int(data.I_uid),
+		int(data.I_gid),
+		int(data.I_size),
+		data.I_atime[:],
+		data.I_ctime[:],
+		data.I_mtime[:],
+		data.I_block[:],
+		data.I_type[:],
+		data.I_perm[:],
+	)
+}
 
 type Fileblock struct {
 	B_content [64]byte
 }
 
-//  =============================================================
-
 type Content struct {
-	B_name [12]byte
+	B_name  [12]byte
 	B_inodo int32
 }
 
@@ -152,23 +160,19 @@ type Folderblock struct {
 	B_content [4]Content
 }
 
-//  =============================================================
-
 type Pointerblock struct {
 	B_pointers [16]int32
 }
 
-//  =============================================================
-
 type Content_J struct {
 	Operation [10]byte
-	Path [100]byte
-	Content [100]byte
-	Date [17]byte
+	Path      [100]byte
+	Content   [100]byte
+	Date      [17]byte
 }
 
 type Journaling struct {
-	Size int32
-	Ultimo int32
+	Size      int32
+	Ultimo    int32
 	Contenido [50]Content_J
 }

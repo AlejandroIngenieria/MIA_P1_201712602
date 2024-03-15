@@ -154,6 +154,7 @@ var (
 	destino     = flag.String("destino", "", "Destino")
 	ugo         = flag.String("ugo", "", "UGO")
 	file        = flag.String("file", "", "File to process")
+	flagN       = flag.Bool("error", false, "Flag not found")
 )
 
 /* -------------------------------------------------------------------------- */
@@ -162,7 +163,12 @@ var (
 func handleMKDISKCommand(input string) {
 
 	flag.Parse()
-	functions_test.ProcessMKDISK(input, size, fit, unit)
+	functions_test.ProcessMKDISK(input, size, fit, unit, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
 
 	// validate size > 0
 	if *size <= 0 {
@@ -182,6 +188,10 @@ func handleMKDISKCommand(input string) {
 		return
 	}
 
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                       MKDISK: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
+
 	// Create the file
 	functions_test.CreateBinFile(size, fit, unit)
 	*size = 0
@@ -191,15 +201,25 @@ func handleMKDISKCommand(input string) {
 
 func handleRMDISKCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessRMDISK(input, driveletter)
-	// validate driveletter be a letter and not empty
-	if !functions_test.ValidDriveLetter(*driveletter) {
-		fmt.Println("Error: DriveLetter must be a letter")
-		return
-	} else if len(*driveletter) == 0 {
-		fmt.Println("Error: DriveLetter cannot be empty")
+	functions_test.ProcessRMDISK(input, driveletter, flagN)
+
+	if *flagN {
+		*flagN = false
 		return
 	}
+
+	// validate driveletter be a letter and not empty
+	if !functions_test.ValidDriveLetter(*driveletter) {
+		fmt.Println("Error: DriveLetter debe ser una letra")
+		return
+	} else if len(*driveletter) == 0 {
+		fmt.Println("Error: DriveLetter es un campo obligatorio")
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                       MKDISK: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
 
 	functions_test.DeleteBinFile(driveletter)
 	*driveletter = ""
@@ -207,7 +227,12 @@ func handleRMDISKCommand(input string) {
 
 func handleFDISKCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessFDISK(input, size, driveletter, name, unit, type_, fit, delete, add, path)
+	functions_test.ProcessFDISK(input, size, driveletter, name, unit, type_, fit, delete, add, path, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
 
 	//Obligatorio cuando no existe la particion
 	// validate size > 0
@@ -255,6 +280,10 @@ func handleFDISKCommand(input string) {
 		}
 	}
 
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        FDISK: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
+
 	functions_test.CRUD_Partitions(size, driveletter, name, unit, type_, fit, delete, add, path)
 	*size = 0
 	*driveletter = ""
@@ -269,7 +298,12 @@ func handleFDISKCommand(input string) {
 
 func handleMOUNTCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessMOUNT(input, driveletter, name)
+	functions_test.ProcessMOUNT(input, driveletter, name, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
 
 	// validate driveletter be a letter and not empty
 	if !functions_test.ValidDriveLetter(*driveletter) {
@@ -280,6 +314,10 @@ func handleMOUNTCommand(input string) {
 		return
 	}
 
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        MOUNT: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
+
 	functions_test.MountPartition(driveletter, name)
 	*driveletter = ""
 	*name = ""
@@ -287,11 +325,47 @@ func handleMOUNTCommand(input string) {
 
 func handleUNMOUNTCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessUNMOUNT(input, id)
+	functions_test.ProcessUNMOUNT(input, id, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
 
 	if *id == "" {
 		println("Error: Id es un campo obligatorio")
 	}
+
+	letra := string((*id)[0])
+	fmt.Println("DISCO:"+letra)
+
+
+	if !functions_test.ValidDriveLetter(letra) {
+		fmt.Println("Error: ID")
+		fmt.Println("Error: DISCO INCORRECTO")
+		return
+	}
+
+	numero := string((*id)[1])
+	fmt.Println("PARTICION:"+numero)
+
+	if !utilities_test.EsNumero(numero){
+		fmt.Println("Error: ID")
+		fmt.Println("Error: PARTICION INCORRECTA")
+		return
+	}
+	
+	fmt.Println("CODIGO:"+string((*id)[2])+string((*id)[3]))
+	
+	if string((*id)[2]) != "0" && string((*id)[3]) != "2" {
+		fmt.Println("Error: ID")
+		fmt.Println("Error: CODIGO INCORRECTO")
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                       UNMOUNT: PARAMETROS CORRECTOS                      ")
+	fmt.Println("--------------------------------------------------------------------------")
 
 	functions_test.UNMOUNT_Partition(id)
 	*id = ""
@@ -299,15 +373,24 @@ func handleUNMOUNTCommand(input string) {
 
 func handleMKFSCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessMKFS(input, id, type_, fs)
+	functions_test.ProcessMKFS(input, id, type_, fs, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
 
 	if *id == "" {
-		println("Error: id cannot be empty")
+		println("Error: id es obligatorio")
 	}
 
 	if *fs != "2fs" && *fs != "3fs" {
-		println("Error: fs must be 2fs or 3fs")
+		println("Error: fs debe ser 2fs o 3fs")
 	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                         MKFS: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
 
 	functions_test.MKFS(id, type_, fs)
 	*id = ""
@@ -427,6 +510,8 @@ func handleMKDIRCommand(input string) {
 	fmt.Print("r: ")
 	fmt.Println(*r)
 
+	functions_test.MKDIR(path, r)
+
 	*path = ""
 	*r = false
 }
@@ -492,7 +577,13 @@ func handlePAUSECommand() {
 
 func handleEXECUTECommand(input string) {
 	flag.Parse()
-	functions_test.ProcessExecute(input, path)
+	functions_test.ProcessExecute(input, path, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
+
 	if *path == "" {
 		fmt.Println("Error: Path cannot be empty")
 		return
@@ -528,12 +619,45 @@ func handleEXECUTECommand(input string) {
 /* -------------------------------------------------------------------------- */
 func handleREPCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessREP(input, name, path, id, ruta)
+	functions_test.ProcessREP(input, name, path, id, ruta, flagN)
+
+	if *flagN {
+		*flagN = true
+		return
+	}
 
 	if *name == "" || *path == "" || *id == "" {
 		println("Error: incomplete statements")
 		return
 	}
+
+	letra := string((*id)[0])
+	fmt.Println("DISCO:"+letra)
+
+
+	if !functions_test.ValidDriveLetter(letra) {
+		fmt.Println("Error: ID")
+		fmt.Println("Error: DISCO INCORRECTO")
+		return
+	}
+
+	numero := string((*id)[1])
+	fmt.Println("PARTICION:"+numero)
+
+	if !utilities_test.EsNumero(numero){
+		fmt.Println("Error: ID")
+		fmt.Println("Error: PARTICION INCORRECTA")
+		return
+	}
+	
+	fmt.Println("CODIGO:"+string((*id)[2])+string((*id)[3]))
+	
+	if string((*id)[2]) != "0" && string((*id)[3]) != "2" {
+		fmt.Println("Error: ID")
+		fmt.Println("Error: CODIGO INCORRECTO")
+		return
+	}
+
 
 	functions_test.GenerateReports(name, path, id, ruta)
 }
