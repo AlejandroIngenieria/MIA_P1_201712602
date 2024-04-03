@@ -1,15 +1,22 @@
 package functions_test
 
 import (
-	structs_test "P1/Structs"
-	utilities_test "P1/Utilities"
+	"P1/Structs"
+	"P1/Utilities"
 	"bytes"
-	"encoding/binary"
+	//"encoding/binary"
 	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
+)
+
+var (
+	inodos     string = ""
+	bloques    string = ""
+	tree       string = ""
+	relaciones string = ""
 )
 
 // ?                     			REPORTES
@@ -44,26 +51,37 @@ func ProcessREP(input string, name *string, path *string, id *string, ruta *stri
 func GenerateReports(name *string, path *string, id *string, ruta *string) {
 
 	switch *name {
+	//1
 	case "mbr":
 		REPORT_MBR(id, path)
+	//2
 	case "disk":
 		REPORT_DISK(id, path)
+	//3
 	case "inode":
 		REPORT_INODE(id, path)
+	//4
 	case "Journaling":
 		REPORT_JOURNALING(id, path)
+	//5
 	case "block":
 		REPORT_BLOCK(id, path)
+	//6
 	case "bm_inode":
 		REPORT_BM_INODE(id, path)
+	//7
 	case "bm_block":
 		REPORT_BM_BLOCK(id, path)
+	//8
 	case "tree":
-		REPORT_TREE(path)
+		REPORT_TREE(id, path)
+	//9
 	case "sb":
 		REPORT_SB(id, path)
+	//10
 	case "file":
 		REPORT_FILE(id, path, ruta)
+	//11
 	case "ls":
 		REPORT_LS(id, path, ruta)
 	default:
@@ -78,11 +96,20 @@ func REPORT_MBR(id *string, path *string) {
 	letra := string((*id)[0])
 	letra = strings.ToUpper(letra)
 	filepath := "./Disks/" + letra + ".dsk"
+
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+
 	file, err := os.Open(filepath)
 	if err != nil {
 		return
 	}
 	defer file.Close()
+
+	/* -------------------------------------------------------------------------- */
+	/*                               CARGAMOS EL MBR                              */
+	/* -------------------------------------------------------------------------- */
 
 	var TempMBR structs_test.MBR
 	// Read object from bin file
@@ -98,6 +125,10 @@ func REPORT_MBR(id *string, path *string) {
 	copy(compareMBR.Mbr_particion[1].Part_type[:], "e")
 	copy(compareMBR.Mbr_particion[2].Part_type[:], "l")
 
+	/* -------------------------------------------------------------------------- */
+	/*                 BUSCAMOS SI EXISTE UNA PARTICION EXTENDIDA                 */
+	/* -------------------------------------------------------------------------- */
+
 	for _, partition := range TempMBR.Mbr_particion {
 		if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) {
 			EPartition = true
@@ -105,8 +136,16 @@ func REPORT_MBR(id *string, path *string) {
 		}
 	}
 
+	/* -------------------------------------------------------------------------- */
+	/*                           ANALISIS DE CODIGO DOT                           */
+	/* -------------------------------------------------------------------------- */
+
 	strP := ""
 	strE := ""
+
+	/* -------------------------------------------------------------------------- */
+	/*                                 PARTICIONES                                */
+	/* -------------------------------------------------------------------------- */
 
 	for _, partition := range TempMBR.Mbr_particion {
 		partNameClean := strings.Trim(string(partition.Part_name[:]), "\x00")
@@ -130,7 +169,9 @@ func REPORT_MBR(id *string, path *string) {
 				partNameClean,
 			)
 		}
-
+		/* -------------------------------------------------------------------------- */
+		/*                             PARTICION EXTENDIDA                            */
+		/* -------------------------------------------------------------------------- */
 		//?EBR verificacion
 		if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) && EPartition {
 			// Validar que si no existe una particion extendida no se puede crear una logica
@@ -190,7 +231,9 @@ func REPORT_MBR(id *string, path *string) {
 
 	}
 
-	//structs_test.PrintMBR(TempMBR)
+	/* -------------------------------------------------------------------------- */
+	/*                               CODIGO DOT BASE                              */
+	/* -------------------------------------------------------------------------- */
 
 	dotCode := fmt.Sprintf(`
 		digraph G {
@@ -229,7 +272,10 @@ func REPORT_MBR(id *string, path *string) {
 		strE,
 	)
 
-	// Escribir el contenido en el archivo DOT
+	/* -------------------------------------------------------------------------- */
+	/*                          ESCRIBIMOS EL CODIGO DOT                          */
+	/* -------------------------------------------------------------------------- */
+
 	dotFilePath := "./Reports/Rep1/mbr_rep.dot" // Ruta donde deseas guardar el archivo DOT
 	dotFile, err := os.Create(dotFilePath)
 	if err != nil {
@@ -244,7 +290,10 @@ func REPORT_MBR(id *string, path *string) {
 		return
 	}
 
-	// Llamar a Graphviz para generar el gráfico
+	/* -------------------------------------------------------------------------- */
+	/*                         GENERAMOS EL GRAFO COMO PNG                        */
+	/* -------------------------------------------------------------------------- */
+
 	pngFilePath := *path // Ruta donde deseas guardar el archivo PNG
 	cmd := exec.Command("dot", "-Tpng", "-o", pngFilePath, dotFilePath)
 	err = cmd.Run()
@@ -253,7 +302,10 @@ func REPORT_MBR(id *string, path *string) {
 		return
 	}
 
-	fmt.Println("Reporte MBR, EBR generado en", pngFilePath)
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("               REPORTE-MBR/EBR: GENERADO CORRECTAMENTE                    ")
+	fmt.Printf("                          %s                          ", pngFilePath)
+	fmt.Println("--------------------------------------------------------------------------")
 }
 
 /* -------------------------------------------------------------------------- */
@@ -264,12 +316,20 @@ func REPORT_DISK(id *string, path *string) {
 	letra := string((*id)[0])
 	letra = strings.ToUpper(letra)
 
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+
 	filepath := "./Disks/" + letra + ".dsk"
 	file, err := os.Open(filepath)
 	if err != nil {
 		return
 	}
 	defer file.Close()
+
+	/* -------------------------------------------------------------------------- */
+	/*                                LEEMOS EL MBR                               */
+	/* -------------------------------------------------------------------------- */
 
 	var TempMBR structs_test.MBR
 	// Read object from bin file
@@ -280,10 +340,18 @@ func REPORT_DISK(id *string, path *string) {
 	var EPartition = false
 	var EPartitionStart int
 
+	/* -------------------------------------------------------------------------- */
+	/*                          ESTRUCTURA PARA COMPARAR                          */
+	/* -------------------------------------------------------------------------- */
+
 	var compareMBR structs_test.MBR
 	copy(compareMBR.Mbr_particion[0].Part_type[:], "p")
 	copy(compareMBR.Mbr_particion[1].Part_type[:], "e")
 	copy(compareMBR.Mbr_particion[2].Part_type[:], "l")
+
+	/* -------------------------------------------------------------------------- */
+	/*                 BUSCAMOS SI EXISTE UNA PARTICION EXTENDIDA                 */
+	/* -------------------------------------------------------------------------- */
 
 	for _, partition := range TempMBR.Mbr_particion {
 		if bytes.Equal(partition.Part_type[:], compareMBR.Mbr_particion[1].Part_type[:]) {
@@ -291,6 +359,10 @@ func REPORT_DISK(id *string, path *string) {
 			EPartitionStart = int(partition.Part_start)
 		}
 	}
+
+	/* -------------------------------------------------------------------------- */
+	/*              ITERAMOS LAS PARTICIONES PARA VER ORDEN Y ESPACIO             */
+	/* -------------------------------------------------------------------------- */
 
 	strP := ""
 	lastSize := int(TempMBR.Mbr_tamano)
@@ -355,6 +427,11 @@ func REPORT_DISK(id *string, path *string) {
 			}
 		}
 	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                        EL ESPACIO RESTANTE DEL DISCO                       */
+	/* -------------------------------------------------------------------------- */
+
 	porcentaje := utilities_test.CalcularPorcentaje(int64(lastSize), int64(TempMBR.Mbr_tamano))
 	fmt.Print("PORCENTAJE RESTANTE: ")
 	println(porcentaje)
@@ -363,7 +440,9 @@ func REPORT_DISK(id *string, path *string) {
 	}
 	strP += "}"
 
-	//structs_test.PrintMBR(TempMBR)
+	/* -------------------------------------------------------------------------- */
+	/*                             CODIGO DE GRAPHVIZ                             */
+	/* -------------------------------------------------------------------------- */
 
 	dotCode := fmt.Sprintf(`
 		digraph G {
@@ -387,7 +466,10 @@ func REPORT_DISK(id *string, path *string) {
 		strP,
 	)
 
-	// Escribir el contenido en el archivo DOT
+	/* -------------------------------------------------------------------------- */
+	/*                          ESCRITURA DEL ARCHIVO DOT                         */
+	/* -------------------------------------------------------------------------- */
+
 	dotFilePath := "./Reports/Rep2/disk_rep.dot" // Ruta donde deseas guardar el archivo DOT
 	dotFile, err := os.Create(dotFilePath)
 	if err != nil {
@@ -402,7 +484,10 @@ func REPORT_DISK(id *string, path *string) {
 		return
 	}
 
-	// Llamar a Graphviz para generar el gráfico
+	/* -------------------------------------------------------------------------- */
+	/*                        GENERAMOS EL GRAFICO COMO PNG                       */
+	/* -------------------------------------------------------------------------- */
+
 	pngFilePath := *path // Ruta donde deseas guardar el archivo PNG
 	cmd := exec.Command("dot", "-Tpng", "-o", pngFilePath, dotFilePath)
 	err = cmd.Run()
@@ -411,9 +496,10 @@ func REPORT_DISK(id *string, path *string) {
 		return
 	}
 
-	fmt.Println("Reporte DISK generado en", pngFilePath)
-	println("MBR")
-	structs_test.PrintMBR(TempMBR)
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                 REPORTE-DISK: GENERADO CORRECTAMENTE                     ")
+	fmt.Printf("                          %s                          ", pngFilePath)
+	fmt.Println("--------------------------------------------------------------------------")
 }
 
 /* -------------------------------------------------------------------------- */
@@ -421,35 +507,403 @@ func REPORT_DISK(id *string, path *string) {
 /* -------------------------------------------------------------------------- */
 
 func REPORT_INODE(id *string, path *string) {
+	inodos = ""
+	letra := string((*id)[0])
+	letra = strings.ToUpper(letra)
+	filepath := "./Disks/" + letra + ".dsk"
+
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+
+	file, err := os.Open(filepath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	/* -------------------------------------------------------------------------- */
+	/*                              CARGAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+	var TempMBR structs_test.MBR
+	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
+		fmt.Println("Error reading MBR:", err)
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                       BUSCAMOS LA PARTICION CON EL ID                      */
+	/* -------------------------------------------------------------------------- */
+	index := -1
+	for i := 0; i < 4; i++ {
+		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), string((*id)[1])) {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		fmt.Println("Partition not found")
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                           CARGAMOS EL SUPERBLOQUE                          */
+	/* -------------------------------------------------------------------------- */
+	var tempSuperblock structs_test.Superblock
+	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
+		fmt.Println("Error reading superblock:", err)
+		return
+	}
+
+	CargarArbol(tempSuperblock, file, 0)
+
+	/* -------------------------------------------------------------------------- */
+	/*                               CODIGO DOT BASE                              */
+	/* -------------------------------------------------------------------------- */
+
+	dotCode := fmt.Sprintf(`
+		digraph G {
+ 			fontname="Helvetica,Arial,sans-serif"
+			node [fontname="Helvetica,Arial,sans-serif"]
+			edge [fontname="Helvetica,Arial,sans-serif"]
+			concentrate=True;
+			rankdir=LR;
+			node [shape=record];
+			
+			%s
+		}`,
+		inodos,
+	)
+
+	/* -------------------------------------------------------------------------- */
+	/*                          ESCRIBIMOS EL CODIGO DOT                          */
+	/* -------------------------------------------------------------------------- */
+
+	dotFilePath := "./Reports/Rep3/inodes_rep.dot" // Ruta donde deseas guardar el archivo DOT
+	dotFile, err := os.Create(dotFilePath)
+	if err != nil {
+		fmt.Println("Error al crear el archivo DOT:", err)
+		return
+	}
+	defer dotFile.Close()
+
+	_, err = dotFile.WriteString(dotCode)
+	if err != nil {
+		fmt.Println("Error al escribir en el archivo DOT:", err)
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                         GENERAMOS EL GRAFO COMO PNG                        */
+	/* -------------------------------------------------------------------------- */
+
+	pngFilePath := *path // Ruta donde deseas guardar el archivo PNG
+	cmd := exec.Command("dot", "-Tsvg", "-o", pngFilePath, dotFilePath)
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println("Error al generar el gráfico:", err)
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("               REPORTE-INODOS: GENERADO CORRECTAMENTE                    ")
+	fmt.Printf("                          %s                          ", pngFilePath)
+	fmt.Println("--------------------------------------------------------------------------")
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              4 REPORTE BLOCK                               */
+/*                          4 REPORTE JOURNALING                             */
+/* -------------------------------------------------------------------------- */
+
+func REPORT_JOURNALING(id *string, path *string) {
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              5 REPORTE BLOCK                               */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_BLOCK(id *string, path *string) {
+	bloques = ""
+	letra := string((*id)[0])
+	letra = strings.ToUpper(letra)
+	filepath := "./Disks/" + letra + ".dsk"
 
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+
+	file, err := os.Open(filepath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	/* -------------------------------------------------------------------------- */
+	/*                              CARGAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+	var TempMBR structs_test.MBR
+	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
+		fmt.Println("Error reading MBR:", err)
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                       BUSCAMOS LA PARTICION CON EL ID                      */
+	/* -------------------------------------------------------------------------- */
+	index := -1
+	for i := 0; i < 4; i++ {
+		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), string((*id)[1])) {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		fmt.Println("Partition not found")
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                           CARGAMOS EL SUPERBLOQUE                          */
+	/* -------------------------------------------------------------------------- */
+	var tempSuperblock structs_test.Superblock
+	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
+		fmt.Println("Error reading superblock:", err)
+		return
+	}
+
+	CargarArbol(tempSuperblock, file, 0)
+	/* -------------------------------------------------------------------------- */
+	/*                               CODIGO DOT BASE                              */
+	/* -------------------------------------------------------------------------- */
+
+	dotCode := fmt.Sprintf(`
+		digraph G {
+ 			fontname="Helvetica,Arial,sans-serif"
+			node [fontname="Helvetica,Arial,sans-serif"]
+			edge [fontname="Helvetica,Arial,sans-serif"]
+			concentrate=True;
+			rankdir=LR;
+			node [shape=record];
+			title [label="Reporte INODOS" shape=plaintext fontname="Helvetica,Arial,sans-serif"];
+			%s
+		}`,
+		bloques,
+	)
+
+	/* -------------------------------------------------------------------------- */
+	/*                          ESCRIBIMOS EL CODIGO DOT                          */
+	/* -------------------------------------------------------------------------- */
+
+	dotFilePath := "./Reports/Rep5/bloques_rep.dot" // Ruta donde deseas guardar el archivo DOT
+	dotFile, err := os.Create(dotFilePath)
+	if err != nil {
+		fmt.Println("Error al crear el archivo DOT:", err)
+		return
+	}
+	defer dotFile.Close()
+
+	_, err = dotFile.WriteString(dotCode)
+	if err != nil {
+		fmt.Println("Error al escribir en el archivo DOT:", err)
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                         GENERAMOS EL GRAFO COMO PNG                        */
+	/* -------------------------------------------------------------------------- */
+
+	pngFilePath := *path // Ruta donde deseas guardar el archivo PNG
+	cmd := exec.Command("dot", "-Tsvg", "-o", pngFilePath, dotFilePath)
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println("Error al generar el gráfico:", err)
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("               REPORTE-BLOQUES: GENERADO CORRECTAMENTE                    ")
+	fmt.Printf("                          %s                          ", pngFilePath)
+	fmt.Println("--------------------------------------------------------------------------")
 }
 
 /* -------------------------------------------------------------------------- */
-/*                            5 REPORTE BM_INODE                              */
+/*                            6 REPORTE BM_INODE                              */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_BM_INODE(id *string, path *string) {
+	letra := string((*id)[0])
+	letra = strings.ToUpper(letra)
+	filepath := "./Disks/" + letra + ".dsk"
 
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+
+	file, err := os.Open(filepath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	/* -------------------------------------------------------------------------- */
+	/*                              CARGAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+	var TempMBR structs_test.MBR
+	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
+		fmt.Println("Error reading MBR:", err)
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                       BUSCAMOS LA PARTICION CON EL ID                      */
+	/* -------------------------------------------------------------------------- */
+	index := -1
+	for i := 0; i < 4; i++ {
+		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), string((*id)[1])) {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		fmt.Println("Partition not found")
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                           CARGAMOS EL SUPERBLOQUE                          */
+	/* -------------------------------------------------------------------------- */
+	var tempSuperblock structs_test.Superblock
+	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
+		fmt.Println("Error reading superblock:", err)
+		return
+	}
+
+	var bitmap string
+	print("CREADOS: ")
+	println(tempSuperblock.S_inodes_count)
+	print("LIBRES: ")
+	println(tempSuperblock.S_free_inodes_count)
+	cont := 0
+	for i := 0; i <= int(tempSuperblock.S_inodes_count); i++ {
+		bitmap += " 1 "
+		cont++
+		if cont == 20 {
+			bitmap += "\n"
+			cont = 0
+		}
+	}
+	for i := 0; i < int(tempSuperblock.S_free_inodes_count); i++ {
+		if cont == 20 {
+			bitmap += "\n"
+			cont = 0
+		}
+		bitmap += " 0 "
+		cont++
+	}
+
+	file1, err := os.Create(*path)
+	if err != nil {
+		fmt.Println("Error al crear el archivo:", err)
+		return
+	}
+	defer file1.Close()
+	//println(bitmap)
+	_, err = file1.WriteString(bitmap)
+	if err != nil {
+		fmt.Println("Error al escribir en el archivo:", err)
+		return
+	}
 }
 
 /* -------------------------------------------------------------------------- */
-/*                             6 REPORTE BM_BLOC                              */
+/*                             7 REPORTE BM_BLOC                              */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_BM_BLOCK(id *string, path *string) {
+	letra := string((*id)[0])
+	letra = strings.ToUpper(letra)
+	filepath := "./Disks/" + letra + ".dsk"
+
+	/* -------------------------------------------------------------------------- */
+	/*                              BUSCAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+
+	file, err := os.Open(filepath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	/* -------------------------------------------------------------------------- */
+	/*                              CARGAMOS EL DISCO                             */
+	/* -------------------------------------------------------------------------- */
+	var TempMBR structs_test.MBR
+	if err := utilities_test.ReadObject(file, &TempMBR, 0); err != nil {
+		fmt.Println("Error reading MBR:", err)
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                       BUSCAMOS LA PARTICION CON EL ID                      */
+	/* -------------------------------------------------------------------------- */
+	index := -1
+	for i := 0; i < 4; i++ {
+		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), string((*id)[1])) {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		fmt.Println("Partition not found")
+		return
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                           CARGAMOS EL SUPERBLOQUE                          */
+	/* -------------------------------------------------------------------------- */
+	var tempSuperblock structs_test.Superblock
+	if err := utilities_test.ReadObject(file, &tempSuperblock, int64(TempMBR.Mbr_particion[index].Part_start)); err != nil {
+		fmt.Println("Error reading superblock:", err)
+		return
+	}
+
+	var bitmap string
+	print("CREADOS: ")
+	println(tempSuperblock.S_blocks_count)
+	print("LIBRES: ")
+	println(tempSuperblock.S_free_blocks_count)
+	cont := 0
+	for i := 0; i <= int(tempSuperblock.S_blocks_count); i++ {
+		bitmap += " 1 "
+		cont++
+		if cont == 20 {
+			bitmap += "\n"
+			cont = 0
+		}
+	}
+	for i := 0; i < int(tempSuperblock.S_free_blocks_count); i++ {
+		if cont == 20 {
+			bitmap += "\n"
+			cont = 0
+		}
+		bitmap += " 0 "
+		cont++
+	}
+
+	file1, err := os.Create(*path)
+	if err != nil {
+		fmt.Println("Error al crear el archivo:", err)
+		return
+	}
+	defer file1.Close()
+	//println(bitmap)
+	_, err = file1.WriteString(bitmap)
+	if err != nil {
+		fmt.Println("Error al escribir en el archivo:", err)
+		return
+	}
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              7 REPORTE TREE                                */
+/*                              8 REPORTE TREE                                */
 /* -------------------------------------------------------------------------- */
-func REPORT_TREE(path *string) {
+func REPORT_TREE(id *string, path *string) {
 	/* -------------------------------------------------------------------------- */
 	/*                              BUSCAMOS EL DISCO                             */
 	/* -------------------------------------------------------------------------- */
@@ -475,7 +929,7 @@ func REPORT_TREE(path *string) {
 	/* -------------------------------------------------------------------------- */
 	index := -1
 	for i := 0; i < 4; i++ {
-		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), ID) {
+		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), string((*id)[1])) {
 			index = i
 			break
 		}
@@ -494,147 +948,32 @@ func REPORT_TREE(path *string) {
 		return
 	}
 
-	str := `digraph {
-    node [shape=plaintext]
-    rankdir = LR
-
-    // Título del reporte
-    title [label="Reporte TREE" shape=plaintext fontname="Helvetica,Arial,sans-serif" rank=max];
-`
+	CargarArbol(tempSuperblock, file, 0)
 
 	/* -------------------------------------------------------------------------- */
-	/*                       BUCLE PARA RECORRER LOS INODOS                       */
+	/*                               CODIGO DOT BASE                              */
+	/* -------------------------------------------------------------------------- */
+	tree += inodos
+	tree += bloques
+	tree += relaciones
+	dotCode := fmt.Sprintf(`
+		digraph G {
+ 			fontname="Helvetica,Arial,sans-serif"
+			node [fontname="Helvetica,Arial,sans-serif"]
+			edge [fontname="Helvetica,Arial,sans-serif"]
+			concentrate=True;
+			rankdir=LR;
+			node [shape=record];
+			%s
+		}`,
+		tree,
+	)
+
+	/* -------------------------------------------------------------------------- */
+	/*                          ESCRIBIMOS EL CODIGO DOT                          */
 	/* -------------------------------------------------------------------------- */
 
-	for i := 0; i < int(tempSuperblock.S_inodes_count); i++ {
-		/* -------------------------------------------------------------------------- */
-		/*                   			LEEMOS EL INODO                               */
-		/* -------------------------------------------------------------------------- */
-		indexInode := int32(i)
-		var crrInode structs_test.Inode
-		if err := utilities_test.ReadObject(file, &crrInode, int64(tempSuperblock.S_inode_start+indexInode*int32(binary.Size(structs_test.Inode{})))); err != nil {
-			fmt.Println("Error reading inode:", err)
-			return
-		}
-
-		str = str + fmt.Sprintf(`i%d [
-        label=<
-            <table border="1" cellborder="1" cellspacing="0">
-                <tr><td colspan="2">Inodo %d</td></tr>
-                <tr><td>UID</td><td>%d</td></tr>
-                <tr><td>GIU</td><td>%d</td></tr>
-                <tr><td>SIZE</td><td>%d</td></tr>
-                <tr><td>A_TIME</td><td>%s</td></tr>
-                <tr><td>C_TIME</td><td>%s</td></tr>
-                <tr><td>M_TIME</td><td>%s</td></tr>
-                <tr><td>BLOCK</td><td>%d</td></tr>
-                <tr><td>TYPE</td><td>%s</td></tr>
-                <tr><td>PERM</td><td>%s</td></tr>
-            </table>
-        >
-    ]`,
-			int(indexInode),
-			int(indexInode),
-			int(crrInode.I_uid),
-			int(crrInode.I_gid),
-			int(crrInode.I_size),
-			crrInode.I_atime[:],
-			crrInode.I_ctime[:],
-			crrInode.I_mtime[:],
-			crrInode.I_block[:],
-			crrInode.I_type[:],
-			crrInode.I_perm[:],
-		)
-
-		fmt.Print("--------------------------------------------------------------------------INODO ")
-		fmt.Print(i)
-		fmt.Println("-------------------------------------------------------------------------")
-		structs_test.PrintInode(crrInode)
-		var bloques int
-		for j := 0; j < 15; j++ {
-			if crrInode.I_block[j] == 1 {
-				bloques += 1
-			}
-		}
-
-		/* -------------------------------------------------------------------------- */
-		/*                     BUCLE PARA MOSTRAR TODO LOS BLOQUES                    */
-		/* -------------------------------------------------------------------------- */
-		fmt.Println("\n\n-------------------BLOQUE---------------------")
-		for j := 0; j < bloques; j++ {
-			var Fileblock structs_test.Fileblock
-			var Folderblock structs_test.Folderblock
-			if i == 0 {
-				searchIndex = 0
-				if err := utilities_test.ReadObject(file, &Folderblock, int64(tempSuperblock.S_block_start)); err != nil {
-					fmt.Println("Error reading Fileblock:", err)
-					return
-				}
-				data := Folderblock.B_content[:]
-				// Dividir la cadena en líneas
-
-				/* -------------------------------------------------------------------------- */
-				/*          ITERAMOS EN CADA LINEA PARA QUE NO HAYAN GRUPOS REPETIDOS         */
-				/* -------------------------------------------------------------------------- */
-
-				str = str + `b0 [
-        label=<
-            <table border="1" cellborder="1" cellspacing="0">
-			<tr><td colspan="2">Bloque 0</td></tr>`
-				for _, line := range data {
-					// Imprimir cada línea
-					str = str + fmt.Sprintf(`
-                <tr><td>%s</td><td>%d</td></tr>`,
-						string(utilities_test.LimpiarCerosBinarios(line.B_name[:])),
-						line.B_inodo,
-					)
-				}
-				str = str + `</table>
-        >
-    ]
-	
-		i0 -> b0
-
-		b0 -> i1
-		`
-
-			} else {
-				if err := utilities_test.ReadObject(file, &Fileblock, int64(tempSuperblock.S_block_start+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))+crrInode.I_block[0]*int32(binary.Size(structs_test.Fileblock{}))*int32(j))); err != nil {
-					fmt.Println("Error reading Fileblock:", err)
-					return
-				}
-				data := string(Fileblock.B_content[:])
-				// Dividir la cadena en líneas
-				lines := strings.Split(data, "\n")
-
-				/* -------------------------------------------------------------------------- */
-				/*          ITERAMOS EN CADA LINEA PARA QUE NO HAYAN GRUPOS REPETIDOS         */
-				/* -------------------------------------------------------------------------- */
-				str = str + fmt.Sprintf(`b%d [
-        label=<
-            <table border="1" cellborder="1" cellspacing="0">
-			<tr><td colspan="2">Bloque %d</td></tr>`, searchIndex, searchIndex)
-				for z := 0; z < len(lines)-1; z++ {
-					// Imprimir cada línea
-					str = str + fmt.Sprintf(`
-					<tr><td>%s</td></tr>`, lines[z])
-
-				}
-				str = str + `</table>
-        >
-    ]`
-
-			}
-
-			str = str + fmt.Sprintf(`
-			i1 -> b%d
-			`, searchIndex)
-			searchIndex++
-		}
-	}
-	str = str + "}"
-	// Escribir el contenido en el archivo DOT
-	dotFilePath := "./Reports/Rep7/tree_rep.dot" // Ruta donde deseas guardar el archivo DOT
+	dotFilePath := "./Reports/Rep8/tree_rep.dot" // Ruta donde deseas guardar el archivo DOT
 	dotFile, err := os.Create(dotFilePath)
 	if err != nil {
 		fmt.Println("Error al crear el archivo DOT:", err)
@@ -642,26 +981,33 @@ func REPORT_TREE(path *string) {
 	}
 	defer dotFile.Close()
 
-	_, err = dotFile.WriteString(str)
+	_, err = dotFile.WriteString(dotCode)
 	if err != nil {
 		fmt.Println("Error al escribir en el archivo DOT:", err)
 		return
 	}
 
-	// Llamar a Graphviz para generar el gráfico
+	/* -------------------------------------------------------------------------- */
+	/*                         GENERAMOS EL GRAFO COMO PNG                        */
+	/* -------------------------------------------------------------------------- */
+
 	pngFilePath := *path // Ruta donde deseas guardar el archivo PNG
-	cmd := exec.Command("dot", "-Tpng", "-o", pngFilePath, dotFilePath)
+	cmd := exec.Command("dot", "-Tsvg", "-o", pngFilePath, dotFilePath)
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println("Error al generar el gráfico:", err)
 		return
 	}
 
-	fmt.Println("Reporte TREE generado en", pngFilePath)
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("               REPORTE-TREE: GENERADO CORRECTAMENTE                    ")
+	fmt.Printf("                          %s                          ", pngFilePath)
+	fmt.Println("--------------------------------------------------------------------------")
+
 }
 
 /* -------------------------------------------------------------------------- */
-/*                               8 REPORTE SB                                 */
+/*                               9 REPORTE SB                                 */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_SB(id *string, path *string) {
@@ -691,7 +1037,7 @@ func REPORT_SB(id *string, path *string) {
 	/* -------------------------------------------------------------------------- */
 	index := -1
 	for i := 0; i < 4; i++ {
-		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), ID) {
+		if TempMBR.Mbr_particion[i].Part_size != 0 && strings.Contains(string(TempMBR.Mbr_particion[i].Part_id[:]), string((*id)[1])) {
 			index = i
 			break
 		}
@@ -770,7 +1116,7 @@ func REPORT_SB(id *string, path *string) {
 	)
 
 	// Escribir el contenido en el archivo DOT
-	dotFilePath := "./Reports/Rep8/sb_rep.dot" // Ruta donde deseas guardar el archivo DOT
+	dotFilePath := "./Reports/Rep9/sb_rep.dot" // Ruta donde deseas guardar el archivo DOT
 	dotFile, err := os.Create(dotFilePath)
 	if err != nil {
 		fmt.Println("Error al crear el archivo DOT:", err)
@@ -797,22 +1143,15 @@ func REPORT_SB(id *string, path *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              9 REPORTE FILE                                */
+/*                              10 REPORTE FILE                                */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_FILE(id *string, path *string, ruta *string) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              10 REPORTE LS                                 */
+/*                              11 REPORTE LS                                 */
 /* -------------------------------------------------------------------------- */
 
 func REPORT_LS(id *string, path *string, ruta *string) {
-}
-
-/* -------------------------------------------------------------------------- */
-/*                          11 REPORTE JOURNALING                             */
-/* -------------------------------------------------------------------------- */
-
-func REPORT_JOURNALING(id *string, path *string) {
 }

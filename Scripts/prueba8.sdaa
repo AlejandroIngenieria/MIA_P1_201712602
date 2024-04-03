@@ -1,0 +1,59 @@
+#execute -path=./Scripts/prueba8.sdaa
+
+mkdisk -size=30
+fdisk -size=10 -driveletter=A -name=Particion1 -unit=M
+mount -driveletter=A -name=Particion1
+mkfs -type=full -id=A102 -fs=2fs
+login -user=root -pass=123 -id=A102
+mkgrp -name=usuarios
+mkusr -user=usu1 -pass=11 -grp=usuarios
+logout
+login -user=usu1 -pass=11 -id=A102
+#MKDIR
+mkdir -path=/bin
+mkdir -path=/boot
+mkdir -path=/cdrom
+mkdir -path=/dev
+mkdir -path=/etc
+mkdir -path=/home
+mkdir -path=/lib
+mkdir -path=/lib64
+mkdir -path=/media
+mkdir -path=/mnt
+mkdir -path=/opt
+mkdir -path=/proc
+mkdir -path=/run
+mkdir -path=/sbin
+mkdir -path=/snap
+mkdir -path=/srv
+mkdir -path=/sys
+mkdir -path=/tmp
+mkdir -path=/var
+mkdir -path="/home/archivos/archivos 19"
+mkdir -r -path=/home/archivos/user/docs/usac
+mkdir -r -path=/home/archivos/carpeta1/carpeta2/carpeta3/carpeta4/carpeta5
+
+mkfile -path=/home/archivos/user/docs/Tarea.txt -size=75
+mkfile -path=/home/archivos/user/docs/Tarea2.txt -size=768
+mkfile -path="/home/archivos/noexiste/b1.txt" #ERR NO EXISTE RUTA
+mkfile -path="/home/archivos/b1.txt" -size=-45 #ERR NEGATIVO
+mkfile -r -path=/home/archivos/user/docs/usac/archivos/proyectos/fase1/entrada.txt #RECURSIVO
+mkfile -path=/home/archivos/user/docs/Tarea3.txt -size=10 -cont=/home/alejandro/Documents/Archivos/MIA_P1_201712602/Reports
+
+#REMOVER------------------------------------------------
+#remove -path=/home/archivos/user/docs/usac #Carpeta
+#remove -path=/home/archivos/user/docs/Tarea.txt #Archivo
+
+#rename -path=/home/archivos/user/docs/usac -name=SanCarlos
+#rename -path=/home/archivos/user/docs/Tarea.txt -name=Corto.txt
+
+#MOVER------------------------------------------------
+move -path=/home/archivos/user/docs/Tarea.txt -destino=/home
+
+#COPY------------------------------------------------
+#copy -path=/home/archivos/user/docs/Tarea.txt -destino=/bin #archivo
+
+rep -id=A102 -path=./Reports/Rep8/RENAME.svg -name=tree
+
+#RMDISK
+rmdisk -driveletter=a

@@ -21,14 +21,14 @@ fdisk -size=10 -driveletter=A -name=Particion1 -unit=M
 
 mount -driveletter=A -name=Particion1
 
-#MKFS EXT3
+#MKFS EXT2
 
-mkfs -type=full -id=A102 -fs=3fs
+mkfs -type=full -id=A102 -fs=2fs
 
 login -user=root -pass=123 -id=A102
 
 mkgrp -name=usuarios
-#mkusr -user=usu1 -pass=11 -grp=usuarios
+mkusr -user=usu1 -pass=11 -grp=usuarios
 #rmusr -user=usu1
 mkgrp -name=usuarios1
 mkgrp -name=usuarios2
@@ -51,11 +51,16 @@ mkusr -user=juanito -pass=2020 -grp=usuarios1
 mkusr -user=juanita -pass=2020 -grp=usuarios7
 
 rmusr -user=juanita
+chgrp -user=juanito -grp=usA
+mkusr -user=juan -pass=2020 -grp=usuarios8
+mkusr -user=juana -pass=2020 -grp=usuarios1
+chgrp -user=juana -grp=usA
+mkusr -user=mateo -pass=2020 -grp=usuarios1
 
 logout
 
 login -user=juanito -pass=2020 -id=A102
 
-rep -id=A102 -path=./Reports/Rep8/sb.png -name=sb
+#rep -id=A102 -path=./Reports/Rep8/sb.png -name=sb
 
 rmdisk -driveletter=A

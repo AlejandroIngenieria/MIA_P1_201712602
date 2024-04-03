@@ -19,6 +19,9 @@ import (
 var fileCounter int = 0
 var particionesMontadasListado = "--------------------MOUNT: LISTADO DE PARTICIONES MONTADAS------------------\n"
 var letraD string
+//var BlockCounter int
+//var InodeCounter int
+
 //?                          APLICACION DE COMANDOS
 /* -------------------------------------------------------------------------- */
 /*                               COMANDO MKDISK                               */
@@ -197,7 +200,7 @@ func DeleteBinFile(driveletter *string) {
 			fileCounter--
 		} else {
 			fmt.Println("--------------------------------------------------------------------------")
-			fmt.Printf("                   RMDISK: NO DE ELIMINO EL DISCO %s                      \n", strings.ToUpper(*driveletter))
+			fmt.Printf("                   RMDISK: NO SE ELIMINO EL DISCO %s                      \n", strings.ToUpper(*driveletter))
 			fmt.Println("--------------------------------------------------------------------------")
 			return
 		}
@@ -815,7 +818,9 @@ func ProcessMKFS(input string, id *string, type_ *string, fs *string, flagN *boo
 }
 
 func MKFS(id *string, type_ *string, fs *string) {
-
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Printf("          MKFS: PROCESANDO PARTICION CON EL ID %s                  \n", strings.ToUpper(*id))
+	fmt.Println("--------------------------------------------------------------------------")
 	fmt.Println("Id:", *id)
 	fmt.Println("Type:", *type_)
 	fmt.Println("Fs:", *fs)
@@ -897,6 +902,9 @@ func MKFS(id *string, type_ *string, fs *string) {
 	copy(newSuperblock.S_umtime[:], timeBytes)
 	newSuperblock.S_mnt_count = 0
 
+	//BlockCounter = 0
+	//InodeCounter = 0
+
 	if *fs == "2fs" {
 		create_ext2(n, TempMBR.Mbr_particion[index], newSuperblock, timeString, file)
 	} else {
@@ -962,27 +970,28 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 		}
 	}
 
+	//newSuperblock.S_inodes_count++
 	var Inode0 structs_test.Inode //Inode 0
-	Inode0.I_uid = 0
+	Inode0.I_uid = usuario.ID
 	Inode0.I_gid = 0
 	Inode0.I_size = int32(binary.Size(structs_test.Inode{}))
 	copy(Inode0.I_atime[:], date)
 	copy(Inode0.I_ctime[:], date)
 	copy(Inode0.I_mtime[:], date)
-	copy(Inode0.I_type[:], "1")
+	Inode0.I_type = '1'
 	copy(Inode0.I_perm[:], "664")
 
 	for i := int32(0); i < 15; i++ {
 		Inode0.I_block[i] = -1
 	}
 
-	Inode0.I_block[0] = 1
-
+	Inode0.I_block[0] = 0
 	// . | 0
 	// .. | 0
 	// users.txt | 1
 	//
 
+	//newSuperblock.S_blocks_count++
 	var Folderblock0 structs_test.Folderblock //Bloque 0 -> carpetas
 	copy(Folderblock0.B_content[0].B_name[:], ".")
 	Folderblock0.B_content[0].B_inodo = 0
@@ -990,7 +999,9 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	Folderblock0.B_content[1].B_inodo = 0
 	copy(Folderblock0.B_content[2].B_name[:], "users.txt")
 	Folderblock0.B_content[2].B_inodo = 1
+	Folderblock0.B_content[3].B_inodo = -1
 
+	newSuperblock.S_inodes_count++
 	var Inode1 structs_test.Inode //Inode 1
 	Inode1.I_uid = 1
 	Inode1.I_gid = 0
@@ -998,7 +1009,7 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 	copy(Inode1.I_atime[:], date)
 	copy(Inode1.I_ctime[:], date)
 	copy(Inode1.I_mtime[:], date)
-	copy(Inode1.I_type[:], "1")
+	Inode1.I_type = '1'
 	copy(Inode1.I_perm[:], "664")
 
 	for i := int32(0); i < 15; i++ {
@@ -1007,12 +1018,12 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 
 	Inode1.I_block[0] = 1
 
+	newSuperblock.S_blocks_count++
 	data := "1,G,root\n1,U,root,root,123\n"
 	var Fileblock1 structs_test.Fileblock //Bloque 1 -> archivo
 	copy(Fileblock1.B_content[:], data)
-
-	newSuperblock.S_inodes_count = int32(2)
-	newSuperblock.S_blocks_count = int32(1)
+	// BlockCounter++
+	// InodeCounter++
 	newSuperblock.S_fist_ino = int32(0)
 	newSuperblock.S_first_blo = int32(1)
 
@@ -1064,7 +1075,6 @@ func create_ext2(n int32, partition structs_test.Partition, newSuperblock struct
 		fmt.Println("Error: ", err)
 	}
 	err = utilities_test.WriteObject(file, Fileblock1, int64(newSuperblock.S_block_start+int32(binary.Size(structs_test.Fileblock{})))) //Bloque 1
-
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
@@ -1130,6 +1140,7 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 		}
 	}
 
+	newSuperblock.S_inodes_count++
 	var Inode0 structs_test.Inode //Inode 0
 	Inode0.I_uid = 0
 	Inode0.I_gid = 0
@@ -1137,20 +1148,21 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 	copy(Inode0.I_atime[:], date)
 	copy(Inode0.I_ctime[:], date)
 	copy(Inode0.I_mtime[:], date)
-	copy(Inode0.I_type[:], "1")
+	Inode0.I_type = '1'
 	copy(Inode0.I_perm[:], "664")
 
 	for i := int32(0); i < 15; i++ {
 		Inode0.I_block[i] = -1
 	}
 
-	Inode0.I_block[0] = 1
+	Inode0.I_block[0] = 0
 
 	// . | 0
 	// .. | 0
 	// users.txt | 1
 	//
 
+	newSuperblock.S_blocks_count++
 	var Folderblock0 structs_test.Folderblock //Bloque 0 -> carpetas
 	copy(Folderblock0.B_content[0].B_name[:], ".")
 	Folderblock0.B_content[0].B_inodo = 0
@@ -1158,7 +1170,9 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 	Folderblock0.B_content[1].B_inodo = 0
 	copy(Folderblock0.B_content[2].B_name[:], "users.txt")
 	Folderblock0.B_content[2].B_inodo = 1
+	Folderblock0.B_content[3].B_inodo = -1
 
+	newSuperblock.S_inodes_count++
 	var Inode1 structs_test.Inode //Inode 1
 	Inode1.I_uid = 1
 	Inode1.I_gid = 0
@@ -1166,7 +1180,7 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 	copy(Inode1.I_atime[:], date)
 	copy(Inode1.I_ctime[:], date)
 	copy(Inode1.I_mtime[:], date)
-	copy(Inode1.I_type[:], "1")
+	Inode1.I_type = '1'
 	copy(Inode1.I_perm[:], "664")
 
 	for i := int32(0); i < 15; i++ {
@@ -1175,6 +1189,7 @@ func create_ext3(n int32, partition structs_test.Partition, newSuperblock struct
 
 	Inode1.I_block[0] = 1
 
+	newSuperblock.S_blocks_count++
 	data := "1,G,root\n1,U,root,root,123\n"
 	var Fileblock1 structs_test.Fileblock //Bloque 1 -> archivo
 	copy(Fileblock1.B_content[:], data)

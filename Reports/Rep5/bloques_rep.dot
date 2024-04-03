@@ -1,0 +1,191 @@
+
+		digraph G {
+ 			fontname="Helvetica,Arial,sans-serif"
+			node [fontname="Helvetica,Arial,sans-serif"]
+			edge [fontname="Helvetica,Arial,sans-serif"]
+			concentrate=True;
+			rankdir=LR;
+			node [shape=record];
+			title [label="Reporte INODOS" shape=plaintext fontname="Helvetica,Arial,sans-serif"];
+			bloque0[label="{Bloque 0}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 1 | Name: | users.txt}
+|{Inode | 2 | Name: | bin}
+"];
+bloque1[label="{Bloque 1}
+|{1,G,root\n1,U,root,root,123\n2,G,usuarios\n3,G,adm\n0,G,mail\n\n}
+"];
+bloque2[label="{Bloque 2}
+|{6,G,news\n7,G,sys\n1,G,root,usuario1,password\n\n}
+"];
+bloque3[label="{Bloque 3}
+|{2,G,usuarios,user1,abc\n3,G,usuarios,user2,abc\n\n}
+"];
+bloque4[label="{Bloque 4}
+|{4,G,usuarios,user2,abc\n\n}
+"];
+bloque5[label="{Bloque 5}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque6[label="{Bloque 6}
+|{Inode | 4 | Name: | cdrom}
+|{Inode | 5 | Name: | dev}
+|{Inode | 6 | Name: | etc}
+|{Inode | 7 | Name: | home}
+"];
+bloque8[label="{Bloque 8}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque9[label="{Bloque 9}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque10[label="{Bloque 10}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque11[label="{Bloque 11}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 21 | Name: | archivos}
+|{Inode | -1 | Name: |  }
+"];
+bloque28[label="{Bloque 28}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 22 | Name: | user}
+|{Inode | 25 | Name: | carpeta1}
+"];
+bloque29[label="{Bloque 29}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 23 | Name: | docs}
+|{Inode | -1 | Name: |  }
+"];
+bloque30[label="{Bloque 30}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque32[label="{Bloque 32}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 26 | Name: | carpeta2}
+|{Inode | -1 | Name: |  }
+"];
+bloque33[label="{Bloque 33}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 27 | Name: | carpeta3}
+|{Inode | -1 | Name: |  }
+"];
+bloque34[label="{Bloque 34}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 28 | Name: | carpeta4}
+|{Inode | -1 | Name: |  }
+"];
+bloque35[label="{Bloque 35}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 29 | Name: | carpeta5 }
+|{Inode | -1 | Name: |  }
+"];
+bloque36[label="{Bloque 36}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque12[label="{Bloque 12}
+|{Inode | 9 | Name: | lib64}
+|{Inode | 10 | Name: | media}
+|{Inode | 11 | Name: | mnt}
+|{Inode | 12 | Name: | opt}
+"];
+bloque14[label="{Bloque 14}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque15[label="{Bloque 15}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque16[label="{Bloque 16}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque17[label="{Bloque 17}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque18[label="{Bloque 18}
+|{Inode | 14 | Name: | run}
+|{Inode | 15 | Name: | sbin}
+|{Inode | 16 | Name: | snap}
+|{Inode | 17 | Name: | srv}
+"];
+bloque20[label="{Bloque 20}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque21[label="{Bloque 21}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque22[label="{Bloque 22}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque23[label="{Bloque 23}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque24[label="{Bloque 24}
+|{Inode | 19 | Name: | tmp}
+|{Inode | 20 | Name: | var}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque26[label="{Bloque 26}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque27[label="{Bloque 27}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+
+		}

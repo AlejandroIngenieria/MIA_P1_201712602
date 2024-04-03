@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -218,7 +219,7 @@ func handleRMDISKCommand(input string) {
 	}
 
 	fmt.Println("--------------------------------------------------------------------------")
-	fmt.Println("                       MKDISK: PARAMETROS CORRECTOS                       ")
+	fmt.Println("                       RMDISK: PARAMETROS CORRECTOS                       ")
 	fmt.Println("--------------------------------------------------------------------------")
 
 	functions_test.DeleteBinFile(driveletter)
@@ -337,8 +338,7 @@ func handleUNMOUNTCommand(input string) {
 	}
 
 	letra := string((*id)[0])
-	fmt.Println("DISCO:"+letra)
-
+	fmt.Println("DISCO:" + letra)
 
 	if !functions_test.ValidDriveLetter(letra) {
 		fmt.Println("Error: ID")
@@ -347,16 +347,16 @@ func handleUNMOUNTCommand(input string) {
 	}
 
 	numero := string((*id)[1])
-	fmt.Println("PARTICION:"+numero)
+	fmt.Println("PARTICION:" + numero)
 
-	if !utilities_test.EsNumero(numero){
+	if !utilities_test.EsNumero(numero) {
 		fmt.Println("Error: ID")
 		fmt.Println("Error: PARTICION INCORRECTA")
 		return
 	}
-	
-	fmt.Println("CODIGO:"+string((*id)[2])+string((*id)[3]))
-	
+
+	fmt.Println("CODIGO:" + string((*id)[2]) + string((*id)[3]))
+
 	if string((*id)[2]) != "0" && string((*id)[3]) != "2" {
 		fmt.Println("Error: ID")
 		fmt.Println("Error: CODIGO INCORRECTO")
@@ -403,11 +403,24 @@ func handleMKFSCommand(input string) {
 /* -------------------------------------------------------------------------- */
 func handleLOGINCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessLOGIN(input, user, pass, id)
+	functions_test.ProcessLOGIN(input, user, pass, id, flagN)
 
 	if *user == "" || *pass == "" || *id == "" {
-		println("Error: campos incompletos")
+		fmt.Println("--------------------------------------------------------------------------")
+		fmt.Println("                       LOGIN: PARAMETROS INCOMPLETOS                      ")
+		fmt.Println("--------------------------------------------------------------------------")
+
+		return
 	}
+
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        LOGIN: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
 
 	functions_test.LOGIN(user, pass, id)
 
@@ -417,17 +430,26 @@ func handleLOGINCommand(input string) {
 }
 
 func handleLOGOUTCommand() {
-	functions_test.ProcessLOGOUT()
+	functions_test.LOGOUT()
 }
 
 func handleMKGRPCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessMKGRP(input, name)
+	functions_test.ProcessMKGRP(input, name, flagN)
 
 	if *name == "" {
 		println("Error: el campo name no puede estar vacio")
 		return
 	}
+
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        MKGRP: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
 
 	functions_test.MKGRP(name)
 	*name = ""
@@ -435,20 +457,51 @@ func handleMKGRPCommand(input string) {
 
 func handleRMGRPCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessMKGRP(input, name)
+	functions_test.ProcessRMGRP(input, name, flagN)
 
 	if *name == "" {
 		println("Error: el campo name no puede estar vacio")
 		return
 	}
 
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        RMGRP: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
+
 	functions_test.RMGRP(name)
 	*name = ""
 }
 
+func handleCHGRPCommand(input string) {
+	flag.Parse()
+	functions_test.ProcessCHGRP(input, user, grp, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	if *user == "" || *grp == "" {
+		println("Error: campos incompletos")
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        CHGRP: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
+	functions_test.CHGRP(user, grp)
+	*user = ""
+	*grp = ""
+}
+
 func handleMKUSRCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessMKUSR(input, user, pass, grp)
+	functions_test.ProcessMKUSR(input, user, pass, grp, flagN)
 
 	if len(*user) > 10 {
 		println("Error: user no puede ser mayor a 10 caracteres")
@@ -468,6 +521,15 @@ func handleMKUSRCommand(input string) {
 		return
 	}
 
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        MKUSR: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
+
 	functions_test.MKUSR(user, pass, grp)
 
 	*user = ""
@@ -477,21 +539,25 @@ func handleMKUSRCommand(input string) {
 
 func handleRMUSRCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessRMUSR(input, user)
+	functions_test.ProcessRMUSR(input, user, flagN)
 
 	if *user == "" {
 		println("Error: user no puede estar vacio")
 		return
 	}
 
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        RMUSR: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
+
 	functions_test.RMUSR(user)
 
 	*user = ""
-}
-
-func handleCHGRPCommand(input string) {
-	flag.Parse()
-	functions_test.ProcessCHGRP(input, user, grp)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -499,16 +565,25 @@ func handleCHGRPCommand(input string) {
 /* -------------------------------------------------------------------------- */
 func handleMKDIRCommand(input string) {
 	flag.Parse()
-	functions_test.ProcessMKDIR(input, path, r)
+	functions_test.ProcessMKDIR(input, path, r, flagN)
 
 	if *path == "" {
 		println("Error: path no puede estar vacio")
 		return
 	}
 
-	fmt.Println("Path: " + *path)
-	fmt.Print("r: ")
-	fmt.Println(*r)
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	// fmt.Println("Path: " + *path)
+	// fmt.Print("r: ")
+	// fmt.Println(*r)
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                        MKDIR: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
 
 	functions_test.MKDIR(path, r)
 
@@ -518,9 +593,52 @@ func handleMKDIRCommand(input string) {
 
 func handleMKFILECommand(input string) {
 	flag.Parse()
-	functions_test.ProcessMKFILE(input, path, r, size, cont)
+	functions_test.ProcessMKFILE(input, path, r, size, cont, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	if *path == "" {
+		println("Error: path no puede estar vacio")
+		return
+	}
+
+	if *cont != "" {
+		// Verificar si la ruta existe
+		if _, err := os.Stat(*cont); err == nil {
+			fmt.Println("--------------------------------------------------------------------------")
+			fmt.Println("                        MKFILE: LA RUTA EXISTE                            ")
+			fmt.Println("--------------------------------------------------------------------------")
+			fmt.Println("La ruta existe en el sistema.")
+		} else if os.IsNotExist(err) {
+			fmt.Println("Error: La ruta no existe en el sistema.")
+			return
+		} else {
+			fmt.Println("Error: No se logro verificar la ruta:", err)
+			return
+		}
+	}
+
+	if *size < 0 {
+		println("Error: size negativo")
+		*size = 0
+		return
+	}
+
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("                       MKFILE: PARAMETROS CORRECTOS                       ")
+	fmt.Println("--------------------------------------------------------------------------")
+
+	functions_test.MKFILE(path, r)
+	*path = ""
+	*r = false
+	*size = 0
+	*cont = ""
 }
 
+// A PARTIR DE AQUI FALTA EL FLAGN
 func handleCATCommand(input string) {
 	flag.Parse()
 	functions_test.ProcessCAT(input, file)
@@ -528,7 +646,20 @@ func handleCATCommand(input string) {
 
 func handleREMOVECommand(input string) {
 	flag.Parse()
-	functions_test.ProcessREMOVE(input, path)
+	functions_test.ProcessREMOVE(input, path, flagN)
+
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	if *path == "" {
+		println("Error: path vacio")
+		return
+	}
+
+	functions_test.REMOVE(path)
+	*path = ""
 }
 
 func handleEDITCommand(input string) {
@@ -539,16 +670,50 @@ func handleEDITCommand(input string) {
 func handleRENAMECommand(input string) {
 	flag.Parse()
 	functions_test.ProcessRENAME(input, path, name)
+	if *flagN {
+		*flagN = false
+		return
+	}
+
+	if *path == "" {
+		println("Error: path vacio")
+		return
+	}
+	if *name == "" {
+		println("Error: name vacio")
+		return
+	}
+
+	functions_test.RENAME(path, name)
+	*path = ""
+	*name = ""
 }
 
 func handleCOPYCommand(input string) {
 	flag.Parse()
 	functions_test.ProcessCOPY(input, path, destino)
+
+	if *path == "" || *destino == "" {
+		println("Error: campos incompletos")
+		return
+	}
+
+	functions_test.COPY(path, destino)
+	*path = ""
+	*destino = ""
 }
 
 func handleMOVECommand(input string) {
 	flag.Parse()
 	functions_test.ProcessMOVE(input, path, destino)
+	if *path == "" || *destino == "" {
+		println("Error: campos incompletos")
+		return
+	}
+
+	functions_test.MOVE(path, destino)
+	*path = ""
+	*destino = ""
 }
 
 func handleFINDCommand(input string) {
@@ -632,8 +797,7 @@ func handleREPCommand(input string) {
 	}
 
 	letra := string((*id)[0])
-	fmt.Println("DISCO:"+letra)
-
+	fmt.Println("DISCO:" + letra)
 
 	if !functions_test.ValidDriveLetter(letra) {
 		fmt.Println("Error: ID")
@@ -642,22 +806,21 @@ func handleREPCommand(input string) {
 	}
 
 	numero := string((*id)[1])
-	fmt.Println("PARTICION:"+numero)
+	fmt.Println("PARTICION:" + numero)
 
-	if !utilities_test.EsNumero(numero){
+	if !utilities_test.EsNumero(numero) {
 		fmt.Println("Error: ID")
 		fmt.Println("Error: PARTICION INCORRECTA")
 		return
 	}
-	
-	fmt.Println("CODIGO:"+string((*id)[2])+string((*id)[3]))
-	
+
+	fmt.Println("CODIGO:" + string((*id)[2]) + string((*id)[3]))
+
 	if string((*id)[2]) != "0" && string((*id)[3]) != "2" {
 		fmt.Println("Error: ID")
 		fmt.Println("Error: CODIGO INCORRECTO")
 		return
 	}
-
 
 	functions_test.GenerateReports(name, path, id, ruta)
 }

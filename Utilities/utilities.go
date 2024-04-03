@@ -122,3 +122,4 @@ func EsNumero(caracter string) bool {
     }
     return unicode.IsDigit(runeValue[0])
 }
+

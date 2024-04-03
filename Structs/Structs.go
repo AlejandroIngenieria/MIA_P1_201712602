@@ -129,12 +129,13 @@ type Inode struct {
 	I_ctime [17]byte
 	I_mtime [17]byte
 	I_block [15]int32
-	I_type  [1]byte
+	I_type  byte
 	I_perm  [3]byte
 }
 
 func PrintInode(data Inode) {
-	fmt.Printf("UID: %d \nGID: %d \nSIZE: %d \nACTUAL DATE: %s \nCREATION TIME: %s \nMODIFY TIME: %s \nBLOCKS:%d \nTYPE:%s \nPERM:%s \n",
+	fmt.Printf("INODO %d\nUID: %d \nGID: %d \nSIZE: %d \nACTUAL DATE: %s \nCREATION TIME: %s \nMODIFY TIME: %s \nBLOCKS:%d \nTYPE:%s \nPERM:%s \n",
+		int(data.I_gid),
 		int(data.I_uid),
 		int(data.I_gid),
 		int(data.I_size),
@@ -142,8 +143,8 @@ func PrintInode(data Inode) {
 		data.I_ctime[:],
 		data.I_mtime[:],
 		data.I_block[:],
-		data.I_type[:],
-		data.I_perm[:],
+		string(data.I_type),
+		string(data.I_perm[:]),
 	)
 }
 
@@ -158,6 +159,12 @@ type Content struct {
 
 type Folderblock struct {
 	B_content [4]Content
+}
+
+func PrintFolderBlock(data Folderblock)  {
+	for _,content := range data.B_content{
+		fmt.Printf("Inode %d Name: %s\n", content.B_inodo, string(content.B_name[:]))
+	}
 }
 
 type Pointerblock struct {

@@ -1,0 +1,48 @@
+#execute -path=./Scripts/prueba7.sdaa
+
+#MKDISK
+
+#Crea un disco de 30 Mb
+
+mkdisk -size=30
+
+#FDISK
+
+#Crea una partición primaria llamada Particion1 de 10 Mb
+#con el peor ajuste en el disco A.dsk
+
+fdisk -size=10 -driveletter=A -name=Particion1 -unit=M
+
+#MOUNT 
+
+#driveletter + Particion Correlative + 02
+#Monta las particiones de A.dsk
+#Canet Ejemplo -> 201712602
+
+mount -driveletter=A -name=Particion1
+
+#MKFS EXT3
+
+mkfs -type=full -id=A102 -fs=3fs
+
+login -user=root -pass=123 -id=A102
+
+mkgrp -name=usuarios
+#mkusr -user=usu1 -pass=11 -grp=usuarios
+#rmusr -user=usu1
+
+mkgrp -name=usA
+
+mkgrp -name=usuarios9
+mkusr -user=juanito -pass=2020 -grp=usuarios
+mkusr -user=juanita -pass=2020 -grp=usuarios9
+
+logout
+
+login -user=juanito -pass=2020 -id=A102
+
+mkdir -path=/aS/dsdsd -r
+mkdir -path=/aS/dsdsd
+
+
+rmdisk -driveletter=A

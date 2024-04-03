@@ -1,0 +1,1612 @@
+
+		digraph G {
+ 			fontname="Helvetica,Arial,sans-serif"
+			node [fontname="Helvetica,Arial,sans-serif"]
+			edge [fontname="Helvetica,Arial,sans-serif"]
+			concentrate=True;
+			rankdir=LR;
+			node [shape=record];
+			inodo0[label="{INODO 0}
+|{I_uid|0}
+|{I_gid|0}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[0 3 9 15 21 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|1}
+|{I_perm|664}"];
+
+inodo1[label="{INODO 1}
+|{I_uid|1}
+|{I_gid|0}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|1}
+|{I_perm|664}"];
+
+inodo2[label="{INODO 2}
+|{I_uid|1}
+|{I_gid|2}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo4[label="{INODO 4}
+|{I_uid|1}
+|{I_gid|4}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[5 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo5[label="{INODO 5}
+|{I_uid|1}
+|{I_gid|5}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[6 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo6[label="{INODO 6}
+|{I_uid|1}
+|{I_gid|6}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo7[label="{INODO 7}
+|{I_uid|1}
+|{I_gid|7}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[8 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo21[label="{INODO 21}
+|{I_uid|1}
+|{I_gid|21}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[25 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo22[label="{INODO 22}
+|{I_uid|1}
+|{I_gid|22}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[26 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo23[label="{INODO 23}
+|{I_uid|1}
+|{I_gid|23}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[27 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo24[label="{INODO 24}
+|{I_uid|1}
+|{I_gid|24}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[28 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo25[label="{INODO 25}
+|{I_uid|1}
+|{I_gid|25}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[29 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo26[label="{INODO 26}
+|{I_uid|1}
+|{I_gid|26}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[30 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo27[label="{INODO 27}
+|{I_uid|1}
+|{I_gid|27}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[31 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo28[label="{INODO 28}
+|{I_uid|1}
+|{I_gid|28}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[32 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo29[label="{INODO 29}
+|{I_uid|1}
+|{I_gid|29}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[33 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo9[label="{INODO 9}
+|{I_uid|1}
+|{I_gid|9}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo10[label="{INODO 10}
+|{I_uid|1}
+|{I_gid|10}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[12 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo11[label="{INODO 11}
+|{I_uid|1}
+|{I_gid|11}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[13 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo12[label="{INODO 12}
+|{I_uid|1}
+|{I_gid|12}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[14 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo14[label="{INODO 14}
+|{I_uid|1}
+|{I_gid|14}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[17 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo15[label="{INODO 15}
+|{I_uid|1}
+|{I_gid|15}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[18 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo16[label="{INODO 16}
+|{I_uid|1}
+|{I_gid|16}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[19 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo17[label="{INODO 17}
+|{I_uid|1}
+|{I_gid|17}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[20 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo19[label="{INODO 19}
+|{I_uid|1}
+|{I_gid|19}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[23 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo20[label="{INODO 20}
+|{I_uid|1}
+|{I_gid|20}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[24 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo31[label="{INODO 31}
+|{I_uid|1}
+|{I_gid|31}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[35 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+bloque0[label="{Bloque 0}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 1 | Name: | users.txt}
+|{Inode | 2 | Name: | bin}
+"];
+bloque1[label="{Bloque 1}
+|{1,G,root\n1,U,root,root,123\n2,G,usuarios\n1,G,usuarios,usu1,11\n\n}
+"];
+bloque2[label="{Bloque 2}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque3[label="{Bloque 3}
+|{Inode | 4 | Name: | cdrom}
+|{Inode | 5 | Name: | dev}
+|{Inode | 6 | Name: | etc}
+|{Inode | 7 | Name: | home}
+"];
+bloque5[label="{Bloque 5}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque6[label="{Bloque 6}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque7[label="{Bloque 7}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque8[label="{Bloque 8}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 21 | Name: | archivos}
+|{Inode | -1 | Name: |  }
+"];
+bloque25[label="{Bloque 25}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 22 | Name: | user}
+|{Inode | 25 | Name: | carpeta1}
+"];
+bloque26[label="{Bloque 26}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 23 | Name: | docs}
+|{Inode | -1 | Name: |  }
+"];
+bloque27[label="{Bloque 27}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 24 | Name: | usac}
+|{Inode | -1 | Name: |  }
+"];
+bloque28[label="{Bloque 28}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque29[label="{Bloque 29}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 26 | Name: | carpeta2}
+|{Inode | -1 | Name: |  }
+"];
+bloque30[label="{Bloque 30}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 27 | Name: | carpeta3}
+|{Inode | -1 | Name: |  }
+"];
+bloque31[label="{Bloque 31}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 28 | Name: | carpeta4}
+|{Inode | -1 | Name: |  }
+"];
+bloque32[label="{Bloque 32}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 29 | Name: | carpeta5}
+|{Inode | -1 | Name: |  }
+"];
+bloque33[label="{Bloque 33}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque9[label="{Bloque 9}
+|{Inode | 9 | Name: | lib64}
+|{Inode | 10 | Name: | media}
+|{Inode | 11 | Name: | mnt}
+|{Inode | 12 | Name: | opt}
+"];
+bloque11[label="{Bloque 11}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque12[label="{Bloque 12}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque13[label="{Bloque 13}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque14[label="{Bloque 14}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque15[label="{Bloque 15}
+|{Inode | 14 | Name: | run}
+|{Inode | 15 | Name: | sbin}
+|{Inode | 16 | Name: | snap}
+|{Inode | 17 | Name: | srv}
+"];
+bloque17[label="{Bloque 17}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque18[label="{Bloque 18}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque19[label="{Bloque 19}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque20[label="{Bloque 20}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque21[label="{Bloque 21}
+|{Inode | 19 | Name: | tmp}
+|{Inode | 20 | Name: | var}
+|{Inode | 31 | Name: | Tarea.txt}
+|{Inode | -1 | Name: |  }
+"];
+bloque23[label="{Bloque 23}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque24[label="{Bloque 24}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque35[label="{Bloque 35}
+|{\n}
+"];
+inodo0 -> bloque0;
+bloque0 -> inodo1;
+bloque0 -> inodo2;
+inodo1 -> bloque1;
+inodo2 -> bloque2;
+inodo0 -> bloque3;
+bloque3 -> inodo4;
+bloque3 -> inodo5;
+bloque3 -> inodo6;
+bloque3 -> inodo7;
+inodo4 -> bloque5;
+inodo5 -> bloque6;
+inodo6 -> bloque7;
+inodo7 -> bloque8;
+bloque8 -> inodo21;
+inodo21 -> bloque25;
+bloque25 -> inodo22;
+bloque25 -> inodo25;
+inodo22 -> bloque26;
+bloque26 -> inodo23;
+inodo23 -> bloque27;
+bloque27 -> inodo24;
+inodo24 -> bloque28;
+inodo25 -> bloque29;
+bloque29 -> inodo26;
+inodo26 -> bloque30;
+bloque30 -> inodo27;
+inodo27 -> bloque31;
+bloque31 -> inodo28;
+inodo28 -> bloque32;
+bloque32 -> inodo29;
+inodo29 -> bloque33;
+inodo0 -> bloque9;
+bloque9 -> inodo9;
+bloque9 -> inodo10;
+bloque9 -> inodo11;
+bloque9 -> inodo12;
+inodo9 -> bloque11;
+inodo10 -> bloque12;
+inodo11 -> bloque13;
+inodo12 -> bloque14;
+inodo0 -> bloque15;
+bloque15 -> inodo14;
+bloque15 -> inodo15;
+bloque15 -> inodo16;
+bloque15 -> inodo17;
+inodo14 -> bloque17;
+inodo15 -> bloque18;
+inodo16 -> bloque19;
+inodo17 -> bloque20;
+inodo0 -> bloque21;
+bloque21 -> inodo19;
+bloque21 -> inodo20;
+bloque21 -> inodo31;
+inodo19 -> bloque23;
+inodo20 -> bloque24;
+inodo31 -> bloque35;
+inodo0[label="{INODO 0}
+|{I_uid|0}
+|{I_gid|0}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[0 3 9 15 21 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|1}
+|{I_perm|664}"];
+
+inodo1[label="{INODO 1}
+|{I_uid|1}
+|{I_gid|0}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|1}
+|{I_perm|664}"];
+
+inodo2[label="{INODO 2}
+|{I_uid|1}
+|{I_gid|2}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo4[label="{INODO 4}
+|{I_uid|1}
+|{I_gid|4}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[5 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo5[label="{INODO 5}
+|{I_uid|1}
+|{I_gid|5}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[6 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo6[label="{INODO 6}
+|{I_uid|1}
+|{I_gid|6}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo7[label="{INODO 7}
+|{I_uid|1}
+|{I_gid|7}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[8 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo21[label="{INODO 21}
+|{I_uid|1}
+|{I_gid|21}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[25 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo22[label="{INODO 22}
+|{I_uid|1}
+|{I_gid|22}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[26 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo23[label="{INODO 23}
+|{I_uid|1}
+|{I_gid|23}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[27 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo24[label="{INODO 24}
+|{I_uid|1}
+|{I_gid|24}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[28 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo25[label="{INODO 25}
+|{I_uid|1}
+|{I_gid|25}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[29 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo26[label="{INODO 26}
+|{I_uid|1}
+|{I_gid|26}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[30 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo27[label="{INODO 27}
+|{I_uid|1}
+|{I_gid|27}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[31 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo28[label="{INODO 28}
+|{I_uid|1}
+|{I_gid|28}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[32 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo29[label="{INODO 29}
+|{I_uid|1}
+|{I_gid|29}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[33 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo9[label="{INODO 9}
+|{I_uid|1}
+|{I_gid|9}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo10[label="{INODO 10}
+|{I_uid|1}
+|{I_gid|10}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[12 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo11[label="{INODO 11}
+|{I_uid|1}
+|{I_gid|11}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[13 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo12[label="{INODO 12}
+|{I_uid|1}
+|{I_gid|12}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[14 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo14[label="{INODO 14}
+|{I_uid|1}
+|{I_gid|14}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[17 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo15[label="{INODO 15}
+|{I_uid|1}
+|{I_gid|15}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[18 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo16[label="{INODO 16}
+|{I_uid|1}
+|{I_gid|16}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[19 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo17[label="{INODO 17}
+|{I_uid|1}
+|{I_gid|17}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[20 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo19[label="{INODO 19}
+|{I_uid|1}
+|{I_gid|19}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[23 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo20[label="{INODO 20}
+|{I_uid|1}
+|{I_gid|20}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[24 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo31[label="{INODO 31}
+|{I_uid|1}
+|{I_gid|31}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[35 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo0[label="{INODO 0}
+|{I_uid|0}
+|{I_gid|0}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[0 3 9 15 21 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|1}
+|{I_perm|664}"];
+
+inodo1[label="{INODO 1}
+|{I_uid|1}
+|{I_gid|0}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|1}
+|{I_perm|664}"];
+
+inodo2[label="{INODO 2}
+|{I_uid|1}
+|{I_gid|2}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo4[label="{INODO 4}
+|{I_uid|1}
+|{I_gid|4}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[5 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo5[label="{INODO 5}
+|{I_uid|1}
+|{I_gid|5}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[6 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo6[label="{INODO 6}
+|{I_uid|1}
+|{I_gid|6}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo7[label="{INODO 7}
+|{I_uid|1}
+|{I_gid|7}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[8 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo21[label="{INODO 21}
+|{I_uid|1}
+|{I_gid|21}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[25 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo22[label="{INODO 22}
+|{I_uid|1}
+|{I_gid|22}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[26 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo23[label="{INODO 23}
+|{I_uid|1}
+|{I_gid|23}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[27 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo24[label="{INODO 24}
+|{I_uid|1}
+|{I_gid|24}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[28 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo25[label="{INODO 25}
+|{I_uid|1}
+|{I_gid|25}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[29 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo26[label="{INODO 26}
+|{I_uid|1}
+|{I_gid|26}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[30 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo27[label="{INODO 27}
+|{I_uid|1}
+|{I_gid|27}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[31 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo28[label="{INODO 28}
+|{I_uid|1}
+|{I_gid|28}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[32 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo29[label="{INODO 29}
+|{I_uid|1}
+|{I_gid|29}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[33 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo9[label="{INODO 9}
+|{I_uid|1}
+|{I_gid|9}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo10[label="{INODO 10}
+|{I_uid|1}
+|{I_gid|10}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[12 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo11[label="{INODO 11}
+|{I_uid|1}
+|{I_gid|11}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[13 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo12[label="{INODO 12}
+|{I_uid|1}
+|{I_gid|12}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[14 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo14[label="{INODO 14}
+|{I_uid|1}
+|{I_gid|14}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[17 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo15[label="{INODO 15}
+|{I_uid|1}
+|{I_gid|15}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[18 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo16[label="{INODO 16}
+|{I_uid|1}
+|{I_gid|16}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[19 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo17[label="{INODO 17}
+|{I_uid|1}
+|{I_gid|17}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[20 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo19[label="{INODO 19}
+|{I_uid|1}
+|{I_gid|19}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[23 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo20[label="{INODO 20}
+|{I_uid|1}
+|{I_gid|20}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[24 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+inodo31[label="{INODO 31}
+|{I_uid|1}
+|{I_gid|31}
+|{I_size|127}
+|{I_atime|2024-04-02 22:27:}
+|{I_ctime|2024-04-02 22:27:}
+|{I_mtime|2024-04-02 22:27:}
+|{I_block|[35 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1]}
+|{I_type|0}
+|{I_perm|664}"];
+
+bloque0[label="{Bloque 0}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 1 | Name: | users.txt}
+|{Inode | 2 | Name: | bin}
+"];
+bloque1[label="{Bloque 1}
+|{1,G,root\n1,U,root,root,123\n2,G,usuarios\n1,G,usuarios,usu1,11\n\n}
+"];
+bloque2[label="{Bloque 2}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque3[label="{Bloque 3}
+|{Inode | 4 | Name: | cdrom}
+|{Inode | 5 | Name: | dev}
+|{Inode | 6 | Name: | etc}
+|{Inode | 7 | Name: | home}
+"];
+bloque5[label="{Bloque 5}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque6[label="{Bloque 6}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque7[label="{Bloque 7}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque8[label="{Bloque 8}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 21 | Name: | archivos}
+|{Inode | -1 | Name: |  }
+"];
+bloque25[label="{Bloque 25}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 22 | Name: | user}
+|{Inode | 25 | Name: | carpeta1}
+"];
+bloque26[label="{Bloque 26}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 23 | Name: | docs}
+|{Inode | -1 | Name: |  }
+"];
+bloque27[label="{Bloque 27}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 24 | Name: | usac}
+|{Inode | -1 | Name: |  }
+"];
+bloque28[label="{Bloque 28}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque29[label="{Bloque 29}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 26 | Name: | carpeta2}
+|{Inode | -1 | Name: |  }
+"];
+bloque30[label="{Bloque 30}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 27 | Name: | carpeta3}
+|{Inode | -1 | Name: |  }
+"];
+bloque31[label="{Bloque 31}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 28 | Name: | carpeta4}
+|{Inode | -1 | Name: |  }
+"];
+bloque32[label="{Bloque 32}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 29 | Name: | carpeta5}
+|{Inode | -1 | Name: |  }
+"];
+bloque33[label="{Bloque 33}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque9[label="{Bloque 9}
+|{Inode | 9 | Name: | lib64}
+|{Inode | 10 | Name: | media}
+|{Inode | 11 | Name: | mnt}
+|{Inode | 12 | Name: | opt}
+"];
+bloque11[label="{Bloque 11}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque12[label="{Bloque 12}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque13[label="{Bloque 13}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque14[label="{Bloque 14}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque15[label="{Bloque 15}
+|{Inode | 14 | Name: | run}
+|{Inode | 15 | Name: | sbin}
+|{Inode | 16 | Name: | snap}
+|{Inode | 17 | Name: | srv}
+"];
+bloque17[label="{Bloque 17}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque18[label="{Bloque 18}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque19[label="{Bloque 19}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque20[label="{Bloque 20}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque21[label="{Bloque 21}
+|{Inode | 19 | Name: | tmp}
+|{Inode | 20 | Name: | var}
+|{Inode | 31 | Name: | Tarea.txt}
+|{Inode | -1 | Name: |  }
+"];
+bloque23[label="{Bloque 23}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque24[label="{Bloque 24}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque35[label="{Bloque 35}
+|{\n}
+"];
+bloque0[label="{Bloque 0}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 1 | Name: | users.txt}
+|{Inode | 2 | Name: | bin}
+"];
+bloque1[label="{Bloque 1}
+|{1,G,root\n1,U,root,root,123\n2,G,usuarios\n1,G,usuarios,usu1,11\n\n}
+"];
+bloque2[label="{Bloque 2}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque3[label="{Bloque 3}
+|{Inode | 4 | Name: | cdrom}
+|{Inode | 5 | Name: | dev}
+|{Inode | 6 | Name: | etc}
+|{Inode | 7 | Name: | home}
+"];
+bloque5[label="{Bloque 5}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque6[label="{Bloque 6}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque7[label="{Bloque 7}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque8[label="{Bloque 8}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 21 | Name: | archivos}
+|{Inode | -1 | Name: |  }
+"];
+bloque25[label="{Bloque 25}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 22 | Name: | user}
+|{Inode | 25 | Name: | carpeta1}
+"];
+bloque26[label="{Bloque 26}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 23 | Name: | docs}
+|{Inode | -1 | Name: |  }
+"];
+bloque27[label="{Bloque 27}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 24 | Name: | usac}
+|{Inode | -1 | Name: |  }
+"];
+bloque28[label="{Bloque 28}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque29[label="{Bloque 29}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 26 | Name: | carpeta2}
+|{Inode | -1 | Name: |  }
+"];
+bloque30[label="{Bloque 30}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 27 | Name: | carpeta3}
+|{Inode | -1 | Name: |  }
+"];
+bloque31[label="{Bloque 31}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 28 | Name: | carpeta4}
+|{Inode | -1 | Name: |  }
+"];
+bloque32[label="{Bloque 32}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | 29 | Name: | carpeta5}
+|{Inode | -1 | Name: |  }
+"];
+bloque33[label="{Bloque 33}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque9[label="{Bloque 9}
+|{Inode | 9 | Name: | lib64}
+|{Inode | 10 | Name: | media}
+|{Inode | 11 | Name: | mnt}
+|{Inode | 12 | Name: | opt}
+"];
+bloque11[label="{Bloque 11}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque12[label="{Bloque 12}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque13[label="{Bloque 13}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque14[label="{Bloque 14}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque15[label="{Bloque 15}
+|{Inode | 14 | Name: | run}
+|{Inode | 15 | Name: | sbin}
+|{Inode | 16 | Name: | snap}
+|{Inode | 17 | Name: | srv}
+"];
+bloque17[label="{Bloque 17}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque18[label="{Bloque 18}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque19[label="{Bloque 19}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque20[label="{Bloque 20}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque21[label="{Bloque 21}
+|{Inode | 19 | Name: | tmp}
+|{Inode | 20 | Name: | var}
+|{Inode | 31 | Name: | Corto.txt}
+|{Inode | -1 | Name: |  }
+"];
+bloque23[label="{Bloque 23}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque24[label="{Bloque 24}
+|{Inode | 0 | Name: | .}
+|{Inode | 0 | Name: | ..}
+|{Inode | -1 | Name: |  }
+|{Inode | -1 | Name: |  }
+"];
+bloque35[label="{Bloque 35}
+|{\n}
+"];
+inodo0 -> bloque0;
+bloque0 -> inodo1;
+bloque0 -> inodo2;
+inodo1 -> bloque1;
+inodo2 -> bloque2;
+inodo0 -> bloque3;
+bloque3 -> inodo4;
+bloque3 -> inodo5;
+bloque3 -> inodo6;
+bloque3 -> inodo7;
+inodo4 -> bloque5;
+inodo5 -> bloque6;
+inodo6 -> bloque7;
+inodo7 -> bloque8;
+bloque8 -> inodo21;
+inodo21 -> bloque25;
+bloque25 -> inodo22;
+bloque25 -> inodo25;
+inodo22 -> bloque26;
+bloque26 -> inodo23;
+inodo23 -> bloque27;
+bloque27 -> inodo24;
+inodo24 -> bloque28;
+inodo25 -> bloque29;
+bloque29 -> inodo26;
+inodo26 -> bloque30;
+bloque30 -> inodo27;
+inodo27 -> bloque31;
+bloque31 -> inodo28;
+inodo28 -> bloque32;
+bloque32 -> inodo29;
+inodo29 -> bloque33;
+inodo0 -> bloque9;
+bloque9 -> inodo9;
+bloque9 -> inodo10;
+bloque9 -> inodo11;
+bloque9 -> inodo12;
+inodo9 -> bloque11;
+inodo10 -> bloque12;
+inodo11 -> bloque13;
+inodo12 -> bloque14;
+inodo0 -> bloque15;
+bloque15 -> inodo14;
+bloque15 -> inodo15;
+bloque15 -> inodo16;
+bloque15 -> inodo17;
+inodo14 -> bloque17;
+inodo15 -> bloque18;
+inodo16 -> bloque19;
+inodo17 -> bloque20;
+inodo0 -> bloque21;
+bloque21 -> inodo19;
+bloque21 -> inodo20;
+bloque21 -> inodo31;
+inodo19 -> bloque23;
+inodo20 -> bloque24;
+inodo31 -> bloque35;
+inodo0 -> bloque0;
+bloque0 -> inodo1;
+bloque0 -> inodo2;
+inodo1 -> bloque1;
+inodo2 -> bloque2;
+inodo0 -> bloque3;
+bloque3 -> inodo4;
+bloque3 -> inodo5;
+bloque3 -> inodo6;
+bloque3 -> inodo7;
+inodo4 -> bloque5;
+inodo5 -> bloque6;
+inodo6 -> bloque7;
+inodo7 -> bloque8;
+bloque8 -> inodo21;
+inodo21 -> bloque25;
+bloque25 -> inodo22;
+bloque25 -> inodo25;
+inodo22 -> bloque26;
+bloque26 -> inodo23;
+inodo23 -> bloque27;
+bloque27 -> inodo24;
+inodo24 -> bloque28;
+inodo25 -> bloque29;
+bloque29 -> inodo26;
+inodo26 -> bloque30;
+bloque30 -> inodo27;
+inodo27 -> bloque31;
+bloque31 -> inodo28;
+inodo28 -> bloque32;
+bloque32 -> inodo29;
+inodo29 -> bloque33;
+inodo0 -> bloque9;
+bloque9 -> inodo9;
+bloque9 -> inodo10;
+bloque9 -> inodo11;
+bloque9 -> inodo12;
+inodo9 -> bloque11;
+inodo10 -> bloque12;
+inodo11 -> bloque13;
+inodo12 -> bloque14;
+inodo0 -> bloque15;
+bloque15 -> inodo14;
+bloque15 -> inodo15;
+bloque15 -> inodo16;
+bloque15 -> inodo17;
+inodo14 -> bloque17;
+inodo15 -> bloque18;
+inodo16 -> bloque19;
+inodo17 -> bloque20;
+inodo0 -> bloque21;
+bloque21 -> inodo19;
+bloque21 -> inodo20;
+bloque21 -> inodo31;
+inodo19 -> bloque23;
+inodo20 -> bloque24;
+inodo31 -> bloque35;
+
+		}

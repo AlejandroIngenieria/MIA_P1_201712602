@@ -3,12 +3,13 @@ package Global
 import "fmt"
 
 type UserInfo struct {
-	ID     string
-	Nombre string
+	ID      int32
+	Nombre  string
 }
 
 func PrintUser(usr UserInfo) {
-	fmt.Println("ID: " + usr.ID)
+	fmt.Print("ID: ")
+	fmt.Println(usr.ID)
 	fmt.Println("Nombre: " + usr.Nombre)
 }
 
